@@ -1,6 +1,6 @@
 # Todolist Tugas Sekolah
 
-Aplikasi web personal untuk melacak tugas sekolah, jadwal pelajaran mingguan, schedule override (libur/pengganti), serta Quick Notes dengan konversi AI (Gemini).
+Aplikasi web personal untuk melacak tugas sekolah, jadwal pelajaran mingguan, schedule override (libur/pengganti), serta Quick Notes dengan konversi gemini api (on progress still not usable).
 
 ## Fitur Utama
 
