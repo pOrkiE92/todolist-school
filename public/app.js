@@ -1,5 +1,5 @@
 // app.js — Production Client (SPA Vanilla JavaScript)
-// Mengonsumsi Express REST API (/api/tasks, /api/schedule, /api/quicknotes, /api/convert).
+// Mengonsumsi Express REST API (/api/tasks, /api/schedule, /api/quicknotes, /api/settings, /api/convert).
 
 "use strict";
 
@@ -12,27 +12,229 @@ const MAPEL_LIST = [
   "Informatika",
 ];
 
-const DAY_NAMES = [
-  "Minggu",
-  "Senin",
-  "Selasa",
-  "Rabu",
-  "Kamis",
-  "Jumat",
-  "Sabtu",
-];
+// ──────────── I18N DICTIONARY ────────────
+const I18N = {
+  id: {
+    nav_dashboard: "Beranda",
+    nav_tasks: "Tugas",
+    nav_schedule: "Jadwal",
+    nav_notes: "Notes",
+    nav_settings: "Pengaturan",
 
-const STATUS_LABEL = {
-  todo: "Belum dikerjakan",
-  in_progress: "Sedang dikerjakan",
-  done: "Selesai",
+    dash_schedule_title: "Jadwal Hari Ini",
+    dash_all_schedule: "Semua jadwal ›",
+    dash_tasks_title: "Perlu Perhatian",
+    dash_all_tasks: "Semua tugas ›",
+    dash_notes_title: "Catatan Cepat",
+    dash_open_notes: "Buka notes ›",
+    dash_note_placeholder: "Catat sesuatu...",
+    dash_note_hint: "Enter untuk simpan",
+    btn_save: "+ Simpan",
+
+    tasks_title: "Daftar Tugas",
+    tasks_sub: "Kelola tenggat waktu dan status pengerjaan",
+    btn_add_task: "+ Tambah",
+    filter_all_status: "Semua status",
+    filter_all_mapel: "Semua mapel",
+    filter_deadline_asc: "Deadline: terdekat",
+    filter_deadline_desc: "Deadline: terjauh",
+    status_todo: "Belum dikerjakan",
+    status_in_progress: "Sedang dikerjakan",
+    status_done: "Selesai",
+    status_overdue: "Terlambat",
+
+    schedule_title: "Jadwal Pelajaran",
+    schedule_sub: "Jadwal mingguan dan penyesuaian khusus",
+    tab_weekly: "Jadwal Mingguan",
+    tab_overrides: "Pengecualian / Override",
+    btn_add_schedule: "+ Tambah Jadwal",
+    btn_add_override: "+ Tambah Pengecualian",
+
+    override_replace: "Diganti",
+    override_cancel: "Libur",
+    override_extra: "Tambahan",
+
+    notes_title: "Quick Notes",
+    notes_sub: "Catat tugas atau info cepat, konversi jadi task kapan saja",
+    notes_placeholder: "Tulis catatan atau instruksi tugas di sini...",
+
+    settings_title: "Pengaturan",
+    settings_subtitle: "Kustomisasi tampilan, warna aksen, dan preferensi aplikasi",
+    settings_appearance_title: "Tampilan & Warna",
+    settings_appearance_desc: "Pilih tema gelap/terang dan warna aksen favorit",
+    settings_theme_mode: "Mode Tema",
+    settings_accent_color: "Warna Aksen",
+    settings_accent_hint: "Tersedia untuk mode Terang & Gelap",
+    settings_preview_title: "Pratinjau Aksen",
+    settings_preview_btn: "Tombol Utama",
+    settings_preview_badge: "🏷️ Badge Aktif",
+    theme_light: "Terang",
+    theme_dark: "Gelap",
+    theme_system: "Sistem",
+    settings_lang_title: "Bahasa & Format",
+    settings_lang_desc: "Pilih bahasa pengantar antarmuka dan format waktu",
+    settings_lang_label: "Bahasa Antarmuka",
+    settings_time_format_label: "Format Jam",
+    time_format_24: "24 Jam (14:30)",
+    time_format_12: "12 Jam (02:30 PM)",
+    settings_data_title: "Cadangan Data",
+    settings_data_desc: "Unduh salinan data tugas dan jadwal Anda sebagai file JSON",
+    btn_export_data: "Ekspor Data (JSON)",
+    settings_about_title: "Tentang Aplikasi",
+    about_version: "Versi",
+    about_database: "Database",
+    about_timezone: "Zona Waktu",
+    about_storage: "Penyimpanan",
+    about_storage_val: "Permanen (Server & Lokal)",
+
+    toast_task_added: "Tugas berhasil ditambahkan",
+    toast_task_updated: "Tugas berhasil diperbarui",
+    toast_task_deleted: "Tugas berhasil dihapus",
+    toast_status_changed: "Status diubah",
+    toast_schedule_added: "Jadwal berhasil ditambahkan",
+    toast_schedule_updated: "Jadwal berhasil diperbarui",
+    toast_schedule_deleted: "Jadwal berhasil dihapus",
+    toast_override_added: "Pengecualian berhasil disimpan",
+    toast_override_updated: "Pengecualian berhasil diperbarui",
+    toast_override_deleted: "Pengecualian berhasil dihapus",
+    toast_note_saved: "Catatan berhasil disimpan",
+    toast_note_deleted: "Catatan berhasil dihapus",
+    toast_settings_saved: "Pengaturan berhasil disimpan",
+    toast_data_exported: "Data berhasil diekspor",
+  },
+  en: {
+    nav_dashboard: "Dashboard",
+    nav_tasks: "Tasks",
+    nav_schedule: "Schedule",
+    nav_notes: "Notes",
+    nav_settings: "Settings",
+
+    dash_schedule_title: "Today's Schedule",
+    dash_all_schedule: "All schedule ›",
+    dash_tasks_title: "Needs Attention",
+    dash_all_tasks: "All tasks ›",
+    dash_notes_title: "Quick Notes",
+    dash_open_notes: "Open notes ›",
+    dash_note_placeholder: "Note something down...",
+    dash_note_hint: "Press Enter to save",
+    btn_save: "+ Save",
+
+    tasks_title: "Task List",
+    tasks_sub: "Manage deadlines and task progress",
+    btn_add_task: "+ Add Task",
+    filter_all_status: "All statuses",
+    filter_all_mapel: "All subjects",
+    filter_deadline_asc: "Deadline: Earliest",
+    filter_deadline_desc: "Deadline: Latest",
+    status_todo: "To Do",
+    status_in_progress: "In Progress",
+    status_done: "Done",
+    status_overdue: "Overdue",
+
+    schedule_title: "Class Schedule",
+    schedule_sub: "Weekly recurring schedule and exceptions",
+    tab_weekly: "Weekly Schedule",
+    tab_overrides: "Overrides / Exceptions",
+    btn_add_schedule: "+ Add Schedule",
+    btn_add_override: "+ Add Override",
+
+    override_replace: "Replaced",
+    override_cancel: "Holiday",
+    override_extra: "Extra Class",
+
+    notes_title: "Quick Notes",
+    notes_sub: "Capture quick thoughts or homework info, convert to tasks anytime",
+    notes_placeholder: "Write notes or homework instructions here...",
+
+    settings_title: "Settings",
+    settings_subtitle: "Customize appearance, accent colors, and app preferences",
+    settings_appearance_title: "Appearance & Color",
+    settings_appearance_desc: "Choose dark/light theme and your favorite accent color",
+    settings_theme_mode: "Theme Mode",
+    settings_accent_color: "Accent Color",
+    settings_accent_hint: "Available in both Light & Dark modes",
+    settings_preview_title: "Accent Preview",
+    settings_preview_btn: "Primary Button",
+    settings_preview_badge: "🏷️ Active Badge",
+    theme_light: "Light",
+    theme_dark: "Dark",
+    theme_system: "System",
+    settings_lang_title: "Language & Format",
+    settings_lang_desc: "Select interface language and time format",
+    settings_lang_label: "Interface Language",
+    settings_time_format_label: "Time Format",
+    time_format_24: "24-Hour (14:30)",
+    time_format_12: "12-Hour (02:30 PM)",
+    settings_data_title: "Data Backup",
+    settings_data_desc: "Download a backup copy of your tasks and schedule as a JSON file",
+    btn_export_data: "Export Data (JSON)",
+    settings_about_title: "About Application",
+    about_version: "Version",
+    about_database: "Database",
+    about_timezone: "Timezone",
+    about_storage: "Storage",
+    about_storage_val: "Permanent (Server & Local)",
+
+    toast_task_added: "Task added successfully",
+    toast_task_updated: "Task updated successfully",
+    toast_task_deleted: "Task deleted successfully",
+    toast_status_changed: "Status changed",
+    toast_schedule_added: "Schedule added successfully",
+    toast_schedule_updated: "Schedule updated successfully",
+    toast_schedule_deleted: "Schedule deleted successfully",
+    toast_override_added: "Override saved successfully",
+    toast_override_updated: "Override updated successfully",
+    toast_override_deleted: "Override deleted successfully",
+    toast_note_saved: "Note saved successfully",
+    toast_note_deleted: "Note deleted successfully",
+    toast_settings_saved: "Settings saved successfully",
+    toast_data_exported: "Data exported successfully",
+  }
 };
 
-const OVERRIDE_TYPE_LABEL = {
-  replace: "Diganti",
-  cancel: "Libur",
-  extra: "Tambahan",
-};
+// ──────────── SETTINGS STATE ────────────
+let currentLang = localStorage.getItem("app_lang") || "id";
+let currentTheme = localStorage.getItem("app_theme") || "system";
+let currentAccent = localStorage.getItem("app_accent") || "navy";
+let currentTimeFormat = localStorage.getItem("app_time_format") || "24";
+
+function t(key) {
+  return I18N[currentLang]?.[key] || I18N["id"]?.[key] || key;
+}
+
+function getDayNames() {
+  return currentLang === "en"
+    ? ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    : ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+}
+
+// Compatibility getter for DAY_NAMES
+const DAY_NAMES = new Proxy([], {
+  get(_target, prop) {
+    const list = getDayNames();
+    return list[prop];
+  }
+});
+
+function getStatusLabel(status) {
+  return t(`status_${status}`) || status;
+}
+
+const STATUS_LABEL = new Proxy({}, {
+  get(_target, prop) {
+    return getStatusLabel(prop);
+  }
+});
+
+function getOverrideTypeLabel(type) {
+  return t(`override_${type}`) || type;
+}
+
+const OVERRIDE_TYPE_LABEL = new Proxy({}, {
+  get(_target, prop) {
+    return getOverrideTypeLabel(prop);
+  }
+});
 
 // ──────────── GLOBAL STATE ────────────
 let currentTab = "dashboard";
@@ -65,8 +267,12 @@ async function api(path, options = {}) {
 }
 
 // ──────────── DATE HELPERS ────────────
+function getLocale() {
+  return currentLang === "en" ? "en-US" : "id-ID";
+}
+
 function formatFullDate(date = new Date()) {
-  return date.toLocaleDateString("id-ID", {
+  return date.toLocaleDateString(getLocale(), {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -80,26 +286,32 @@ function startOfDay(d) {
   return x;
 }
 
+function formatTime(date) {
+  const is12 = currentTimeFormat === "12";
+  return date.toLocaleTimeString(getLocale(), {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: is12,
+  });
+}
+
 function formatDeadline(iso, now = new Date()) {
   if (!iso) return "-";
   const date = new Date(iso);
   if (isNaN(date.getTime())) return "-";
 
-  const time = date.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const time = formatTime(date);
   const diffDays = Math.round((startOfDay(date).getTime() - startOfDay(now).getTime()) / 86400000);
 
-  if (diffDays === 0) return `Hari ini, ${time}`;
-  if (diffDays === 1) return `Besok, ${time}`;
-  if (diffDays === -1) return `Kemarin, ${time}`;
+  if (diffDays === 0) return (currentLang === "en" ? "Today, " : "Hari ini, ") + time;
+  if (diffDays === 1) return (currentLang === "en" ? "Tomorrow, " : "Besok, ") + time;
+  if (diffDays === -1) return (currentLang === "en" ? "Yesterday, " : "Kemarin, ") + time;
   if (diffDays > 1 && diffDays <= 6) {
-    const rtf = new Intl.RelativeTimeFormat("id-ID", { numeric: "auto" });
+    const rtf = new Intl.RelativeTimeFormat(getLocale(), { numeric: "auto" });
     return `${rtf.format(diffDays, "day")}, ${time}`;
   }
 
-  const dateStr = date.toLocaleDateString("id-ID", {
+  const dateStr = date.toLocaleDateString(getLocale(), {
     day: "numeric",
     month: "short",
     year: date.getFullYear() === now.getFullYear() ? undefined : "numeric",
@@ -154,6 +366,7 @@ function setTab(tabName) {
     else loadOverrides();
   }
   if (tabName === "notes") loadNotes();
+  if (tabName === "settings") loadSettings();
 }
 
 function setScheduleSubTab(sub) {
@@ -1110,6 +1323,200 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // ──────────── SETTINGS MODULE ────────────
+  function applyI18n() {
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (key && I18N[currentLang]?.[key]) {
+        el.textContent = I18N[currentLang][key];
+      }
+    });
+
+    const dashInput = document.getElementById("dash-note-input");
+    if (dashInput) dashInput.placeholder = t("dash_note_placeholder");
+    const notesInput = document.getElementById("notes-input");
+    if (notesInput) notesInput.placeholder = t("notes_placeholder");
+
+    // Update header date
+    const headerDateEl = document.getElementById("header-date");
+    if (headerDateEl) headerDateEl.textContent = formatFullDate(new Date());
+  }
+
+  function setAppTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem("app_theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
+
+    document.querySelectorAll("#theme-segmented .segmented-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-theme-val") === theme);
+    });
+
+    const labelEl = document.getElementById("current-theme-label");
+    if (labelEl) {
+      const labels = {
+        light: t("theme_light"),
+        dark: t("theme_dark"),
+        system: t("theme_system") + ` (${currentLang === "en" ? "System" : "Otomatis"})`,
+      };
+      labelEl.textContent = labels[theme] || theme;
+    }
+
+    api("/settings", { method: "PUT", body: { theme } }).catch(() => {});
+    toast(t("toast_settings_saved"));
+  }
+
+  function setAppAccent(accent) {
+    currentAccent = accent;
+    localStorage.setItem("app_accent", accent);
+    document.documentElement.setAttribute("data-accent", accent);
+
+    document.querySelectorAll("#accent-grid .accent-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-accent-val") === accent);
+    });
+
+    api("/settings", { method: "PUT", body: { accent } }).catch(() => {});
+    toast(t("toast_settings_saved"));
+  }
+
+  function setAppLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem("app_lang", lang);
+
+    document.querySelectorAll("#lang-segmented .segmented-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-lang-val") === lang);
+    });
+
+    applyI18n();
+    api("/settings", { method: "PUT", body: { lang } }).catch(() => {});
+
+    if (currentTab === "dashboard") loadDashboard();
+    else if (currentTab === "tasks") loadTasks();
+    else if (currentTab === "schedule") {
+      if (scheduleSubTab === "weekly") loadSchedule();
+      else loadOverrides();
+    }
+    else if (currentTab === "notes") loadNotes();
+    else if (currentTab === "settings") loadSettings();
+
+    toast(t("toast_settings_saved"));
+  }
+
+  function setAppTimeFormat(fmt) {
+    currentTimeFormat = fmt;
+    localStorage.setItem("app_time_format", fmt);
+
+    document.querySelectorAll("#time-segmented .segmented-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-time-val") === fmt);
+    });
+
+    api("/settings", { method: "PUT", body: { timeFormat: fmt } }).catch(() => {});
+
+    if (currentTab === "dashboard") loadDashboard();
+    else if (currentTab === "tasks") loadTasks();
+    else if (currentTab === "schedule") {
+      if (scheduleSubTab === "weekly") loadSchedule();
+      else loadOverrides();
+    }
+
+    toast(t("toast_settings_saved"));
+  }
+
+  function loadSettings() {
+    document.querySelectorAll("#theme-segmented .segmented-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-theme-val") === currentTheme);
+    });
+
+    const labelEl = document.getElementById("current-theme-label");
+    if (labelEl) {
+      const labels = {
+        light: t("theme_light"),
+        dark: t("theme_dark"),
+        system: t("theme_system") + ` (${currentLang === "en" ? "System" : "Otomatis"})`,
+      };
+      labelEl.textContent = labels[currentTheme] || currentTheme;
+    }
+
+    document.querySelectorAll("#accent-grid .accent-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-accent-val") === currentAccent);
+    });
+
+    document.querySelectorAll("#lang-segmented .segmented-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-lang-val") === currentLang);
+    });
+
+    document.querySelectorAll("#time-segmented .segmented-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-time-val") === currentTimeFormat);
+    });
+  }
+
+  async function exportAppData() {
+    try {
+      const [tasks, schedules, overrides, notes] = await Promise.all([
+        api("/tasks"),
+        api("/schedule"),
+        api("/schedule/overrides"),
+        api("/quicknotes"),
+      ]);
+
+      const backup = {
+        app: "Todolist Sekolah",
+        version: "1.1.0",
+        exported_at: new Date().toISOString(),
+        data: { tasks, schedules, overrides, notes }
+      };
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `todolist-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast(t("toast_data_exported"));
+    } catch (err) {
+      toast(`Export failed: ${err.message}`, "error");
+    }
+  }
+
+  async function initSettingsFromServer() {
+    try {
+      const settings = await api("/settings");
+      if (settings) {
+        if (settings.theme && !localStorage.getItem("app_theme")) {
+          setAppTheme(settings.theme);
+        }
+        if (settings.accent && !localStorage.getItem("app_accent")) {
+          setAppAccent(settings.accent);
+        }
+        if (settings.lang && !localStorage.getItem("app_lang")) {
+          currentLang = settings.lang;
+          localStorage.setItem("app_lang", settings.lang);
+          applyI18n();
+        }
+        if (settings.timeFormat && !localStorage.getItem("app_time_format")) {
+          currentTimeFormat = settings.timeFormat;
+          localStorage.setItem("app_time_format", settings.timeFormat);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Expose to window for inline HTML onclick handlers
+  window.setAppTheme = setAppTheme;
+  window.setAppAccent = setAppAccent;
+  window.setAppLanguage = setAppLanguage;
+  window.setAppTimeFormat = setAppTimeFormat;
+  window.exportAppData = exportAppData;
+
+  // Apply current preferences
+  document.documentElement.setAttribute("data-theme", currentTheme);
+  document.documentElement.setAttribute("data-accent", currentAccent);
+  applyI18n();
+  initSettingsFromServer();
 
   // Initial load
   loadDashboard();

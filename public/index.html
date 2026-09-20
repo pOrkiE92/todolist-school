@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>To Do List</title>
   <link rel="stylesheet" href="app.css" />
+  <script>
+    (function() {
+      try {
+        const theme = localStorage.getItem("app_theme") || "system";
+        const accent = localStorage.getItem("app_accent") || "navy";
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.setAttribute("data-accent", accent);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <!-- Header -->
@@ -18,12 +28,13 @@
       </div>
       <!-- Desktop nav -->
       <nav class="desktop-nav" aria-label="Navigasi Utama">
-        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn active" data-tab="dashboard" data-i18n="nav_dashboard">Dashboard</button>
         <button class="nav-btn" data-tab="tasks">
-          Tugas <span class="badge-dot" id="overdue-dot-desktop" hidden></span>
+          <span data-i18n="nav_tasks">Tugas</span> <span class="badge-dot" id="overdue-dot-desktop" hidden></span>
         </button>
-        <button class="nav-btn" data-tab="schedule">Jadwal</button>
-        <button class="nav-btn" data-tab="notes">Notes</button>
+        <button class="nav-btn" data-tab="schedule" data-i18n="nav_schedule">Jadwal</button>
+        <button class="nav-btn" data-tab="notes" data-i18n="nav_notes">Notes</button>
+        <button class="nav-btn" data-tab="settings" data-i18n="nav_settings">Pengaturan</button>
       </nav>
     </div>
   </header>
@@ -178,28 +189,236 @@
 
       <div id="notes-list"></div>
     </section>
+
+    <!-- Settings Tab -->
+    <section class="tab-panel" id="panel-settings">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title" data-i18n="settings_title">Pengaturan</h2>
+          <p class="panel-sub" data-i18n="settings_subtitle">Kustomisasi tampilan, warna aksen, dan preferensi aplikasi</p>
+        </div>
+      </div>
+
+      <div class="settings-container">
+        <!-- Card 1: Tema & Warna -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">🎨</span>
+            <div>
+              <h3 class="settings-card-title" data-i18n="settings_appearance_title">Tampilan & Warna</h3>
+              <p class="settings-card-desc" data-i18n="settings_appearance_desc">Pilih tema gelap/terang dan warna aksen favorit</p>
+            </div>
+          </div>
+
+          <!-- Theme Mode -->
+          <div class="settings-field">
+            <label class="settings-label">
+              <span data-i18n="settings_theme_mode">Mode Tema</span>
+              <span class="settings-sublabel" id="current-theme-label">Otomatis (Sistem)</span>
+            </label>
+            <div class="segmented-control" id="theme-segmented">
+              <button type="button" class="segmented-btn" data-theme-val="light" onclick="setAppTheme('light')">
+                <span>☀️</span> <span data-i18n="theme_light">Terang</span>
+              </button>
+              <button type="button" class="segmented-btn" data-theme-val="dark" onclick="setAppTheme('dark')">
+                <span>🌙</span> <span data-i18n="theme_dark">Gelap</span>
+              </button>
+              <button type="button" class="segmented-btn active" data-theme-val="system" onclick="setAppTheme('system')">
+                <span>💻</span> <span data-i18n="theme_system">Sistem</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Accent Palette -->
+          <div class="settings-field">
+            <label class="settings-label">
+              <span data-i18n="settings_accent_color">Warna Aksen</span>
+              <span class="settings-sublabel" data-i18n="settings_accent_hint">Tersedia untuk mode Terang & Gelap</span>
+            </label>
+            <div class="accent-grid" id="accent-grid">
+              <!-- Cream -->
+              <button type="button" class="accent-btn" data-accent-val="cream" onclick="setAppAccent('cream')">
+                <span class="accent-dot" style="background-color: #855c34;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Cream</span>
+                  <span class="accent-mode">Latte / Warm</span>
+                </div>
+              </button>
+              <!-- Navy -->
+              <button type="button" class="accent-btn" data-accent-val="navy" onclick="setAppAccent('navy')">
+                <span class="accent-dot" style="background-color: #25406b;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Navy Ocean</span>
+                  <span class="accent-mode">Classic Deep</span>
+                </div>
+              </button>
+              <!-- Emerald -->
+              <button type="button" class="accent-btn" data-accent-val="emerald" onclick="setAppAccent('emerald')">
+                <span class="accent-dot" style="background-color: #15803d;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Emerald</span>
+                  <span class="accent-mode">Forest Green</span>
+                </div>
+              </button>
+              <!-- Violet -->
+              <button type="button" class="accent-btn" data-accent-val="violet" onclick="setAppAccent('violet')">
+                <span class="accent-dot" style="background-color: #6d28d9;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Royal Violet</span>
+                  <span class="accent-mode">Amethyst</span>
+                </div>
+              </button>
+              <!-- Amber -->
+              <button type="button" class="accent-btn" data-accent-val="amber" onclick="setAppAccent('amber')">
+                <span class="accent-dot" style="background-color: #b45309;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Sunset Amber</span>
+                  <span class="accent-mode">Warm Golden</span>
+                </div>
+              </button>
+              <!-- Rose -->
+              <button type="button" class="accent-btn" data-accent-val="rose" onclick="setAppAccent('rose')">
+                <span class="accent-dot" style="background-color: #be185d;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Rose Berry</span>
+                  <span class="accent-mode">Raspberry</span>
+                </div>
+              </button>
+              <!-- Slate -->
+              <button type="button" class="accent-btn" data-accent-val="slate" onclick="setAppAccent('slate')">
+                <span class="accent-dot" style="background-color: #334155;">✓</span>
+                <div class="accent-info">
+                  <span class="accent-name">Monochrome</span>
+                  <span class="accent-mode">Slate Gray</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Preview -->
+          <div class="settings-field">
+            <span class="settings-label" data-i18n="settings_preview_title">Pratinjau Aksen</span>
+            <div class="settings-preview-box">
+              <div class="preview-pill-row">
+                <button type="button" class="settings-btn-preview" data-i18n="settings_preview_btn">Tombol Utama</button>
+                <span class="settings-badge" data-i18n="settings_preview_badge">🏷️ Badge Aktif</span>
+                <span class="badge badge-done" data-i18n="status_done">Selesai</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Bahasa & Regional -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">🌐</span>
+            <div>
+              <h3 class="settings-card-title" data-i18n="settings_lang_title">Bahasa & Format</h3>
+              <p class="settings-card-desc" data-i18n="settings_lang_desc">Pilih bahasa pengantar antarmuka dan format waktu</p>
+            </div>
+          </div>
+
+          <!-- Language Selector -->
+          <div class="settings-field">
+            <label class="settings-label" data-i18n="settings_lang_label">Bahasa Antarmuka</label>
+            <div class="segmented-control segmented-control-2" id="lang-segmented">
+              <button type="button" class="segmented-btn active" data-lang-val="id" onclick="setAppLanguage('id')">
+                <span>🇮🇩</span> <span>Bahasa Indonesia</span>
+              </button>
+              <button type="button" class="segmented-btn" data-lang-val="en" onclick="setAppLanguage('en')">
+                <span>🇬🇧</span> <span>English</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Time Format Selector -->
+          <div class="settings-field">
+            <label class="settings-label" data-i18n="settings_time_format_label">Format Jam</label>
+            <div class="segmented-control segmented-control-2" id="time-segmented">
+              <button type="button" class="segmented-btn active" data-time-val="24" onclick="setAppTimeFormat('24')">
+                <span data-i18n="time_format_24">24 Jam (14:30)</span>
+              </button>
+              <button type="button" class="segmented-btn" data-time-val="12" onclick="setAppTimeFormat('12')">
+                <span data-i18n="time_format_12">12 Jam (02:30 PM)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Manajemen Data & Cadangan -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">💾</span>
+            <div>
+              <h3 class="settings-card-title" data-i18n="settings_data_title">Cadangan Data</h3>
+              <p class="settings-card-desc" data-i18n="settings_data_desc">Unduh salinan data tugas dan jadwal Anda sebagai file JSON</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="exportAppData()">
+              <span>📥</span> <span data-i18n="btn_export_data">Ekspor Data (JSON)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card 4: Tentang Aplikasi -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">ℹ️</span>
+            <div>
+              <h3 class="settings-card-title" data-i18n="settings_about_title">Tentang Aplikasi</h3>
+              <p class="settings-card-desc">To Do List Tugas & Jadwal Sekolah</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="settings-about-row">
+              <span class="settings-about-key" data-i18n="about_version">Versi</span>
+              <span class="settings-about-val">v1.1.0</span>
+            </div>
+            <div class="settings-about-row">
+              <span class="settings-about-key" data-i18n="about_database">Database</span>
+              <span class="settings-about-val">SQLite (Native · Synchronous)</span>
+            </div>
+            <div class="settings-about-row">
+              <span class="settings-about-key" data-i18n="about_timezone">Zona Waktu</span>
+              <span class="settings-about-val">Asia/Jakarta (WIB +07:00)</span>
+            </div>
+            <div class="settings-about-row">
+              <span class="settings-about-key" data-i18n="about_storage">Penyimpanan</span>
+              <span class="settings-about-val" data-i18n="about_storage_val">Permanen (Server & Lokal)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- Mobile Bottom Nav -->
   <nav class="bottom-nav" aria-label="Navigasi Mobile">
     <button class="bottom-nav-btn active" data-tab="dashboard">
       <span class="nav-icon">🏠</span>
-      <span>Beranda</span>
+      <span data-i18n="nav_dashboard">Beranda</span>
     </button>
     <button class="bottom-nav-btn" data-tab="tasks">
       <span class="nav-icon">
         ✓
         <span class="overdue-badge" id="overdue-badge" hidden></span>
       </span>
-      <span>Tugas</span>
+      <span data-i18n="nav_tasks">Tugas</span>
     </button>
     <button class="bottom-nav-btn" data-tab="schedule">
       <span class="nav-icon">📅</span>
-      <span>Jadwal</span>
+      <span data-i18n="nav_schedule">Jadwal</span>
     </button>
     <button class="bottom-nav-btn" data-tab="notes">
       <span class="nav-icon">📝</span>
-      <span>Notes</span>
+      <span data-i18n="nav_notes">Notes</span>
+    </button>
+    <button class="bottom-nav-btn" data-tab="settings">
+      <span class="nav-icon">⚙️</span>
+      <span data-i18n="nav_settings">Pengaturan</span>
     </button>
   </nav>
 
