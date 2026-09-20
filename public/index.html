@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>To Do List</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-text">
+          <span class="brand-title">To Do List</span>
+          <span class="brand-date" id="header-date"></span>
+        </div>
+      </div>
+      <!-- Desktop nav -->
+      <nav class="desktop-nav" aria-label="Navigasi Utama">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="tasks">
+          Tugas <span class="badge-dot" id="overdue-dot-desktop" hidden></span>
+        </button>
+        <button class="nav-btn" data-tab="schedule">Jadwal</button>
+        <button class="nav-btn" data-tab="notes">Notes</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main" id="app-main">
+    <!-- Dashboard -->
+    <section class="tab-panel active" id="panel-dashboard">
+      <!-- Overdue alert -->
+      <div class="alert alert-error" id="overdue-alert" hidden>
+        <div class="alert-content">
+          <span class="alert-icon">⚠</span>
+          <div>
+            <strong id="overdue-alert-text"></strong>
+            <p>Selesaikan sebelum bertambah.</p>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="setTab('tasks')">Lihat</button>
+      </div>
+
+      <!-- Jadwal Hari Ini -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title-row">
+            <span class="section-icon">📅</span>
+            <h2 class="section-title">Jadwal Hari Ini</h2>
+          </div>
+          <button class="link-btn" onclick="setTab('schedule')">Semua jadwal ›</button>
+        </div>
+        <div id="dashboard-schedule"></div>
+      </section>
+
+      <!-- Tugas Perlu Perhatian -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title-row">
+            <span class="section-icon">✅</span>
+            <h2 class="section-title">Perlu Perhatian</h2>
+          </div>
+          <button class="link-btn" onclick="setTab('tasks')">Semua tugas ›</button>
+        </div>
+        <div id="dashboard-tasks"></div>
+      </section>
+
+      <!-- Catatan Cepat -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title-row">
+            <span class="section-icon">📝</span>
+            <h2 class="section-title">Catatan Cepat</h2>
+          </div>
+          <button class="link-btn" id="notes-count-link" onclick="setTab('notes')">Buka notes ›</button>
+        </div>
+        <div class="quick-input-box">
+          <textarea id="dash-note-input" placeholder="Catat sesuatu..." rows="2"></textarea>
+          <div class="quick-input-footer">
+            <span class="hint-text">Enter untuk simpan</span>
+            <button class="btn btn-sm btn-primary" id="dash-note-btn">+ Simpan</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Tasks Tab -->
+    <section class="tab-panel" id="panel-tasks">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Daftar Tugas</h2>
+          <p class="panel-sub">Kelola tenggat waktu dan status pengerjaan</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="add-task-btn">+ Tambah</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="filter-label">Status</label>
+          <select id="filter-status" class="select-sm">
+            <option value="all">Semua Status</option>
+            <option value="todo">Belum dikerjakan</option>
+            <option value="in_progress">Sedang dikerjakan</option>
+            <option value="done">Selesai</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Mapel</label>
+          <select id="filter-mapel" class="select-sm">
+            <option value="all">Semua Mapel</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Urutan</label>
+          <select id="filter-sort" class="select-sm">
+            <option value="asc">Deadline Terdekat</option>
+            <option value="desc">Deadline Terjauh</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="tasks-list"></div>
+    </section>
+
+    <!-- Schedule Tab -->
+    <section class="tab-panel" id="panel-schedule">
+      <!-- Sub-tabs -->
+      <div class="subtab-bar">
+        <div class="subtab-group">
+          <button class="subtab-btn active" id="subtab-weekly" onclick="setScheduleSubTab('weekly')">Jadwal Mingguan</button>
+          <button class="subtab-btn" id="subtab-overrides" onclick="setScheduleSubTab('overrides')">
+            Pengecualian <span id="override-count-badge"></span>
+          </button>
+        </div>
+        <div id="schedule-add-btn-area">
+          <button class="btn btn-primary btn-sm" id="schedule-add-btn">+ Tambah</button>
+        </div>
+      </div>
+
+      <!-- Weekly sub-panel -->
+      <div id="subpanel-weekly">
+        <div class="day-pills" id="day-pills"></div>
+        <div id="schedule-list"></div>
+      </div>
+
+      <!-- Overrides sub-panel -->
+      <div id="subpanel-overrides" hidden>
+        <p class="help-text">Perubahan jadwal pada tanggal tertentu. Jadwal mingguan dasar tetap utuh.</p>
+        <div id="overrides-list"></div>
+      </div>
+    </section>
+
+    <!-- Notes Tab -->
+    <section class="tab-panel" id="panel-notes">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Quick Notes</h2>
+          <p class="panel-sub">Brain dump — tulis apa pun tanpa struktur wajib</p>
+        </div>
+      </div>
+
+      <div class="quick-input-box">
+        <textarea id="notes-input" placeholder="Catat sesuatu..." rows="2"></textarea>
+        <div class="quick-input-footer">
+          <span class="hint-text">Enter untuk simpan</span>
+          <button class="btn btn-sm btn-primary" id="notes-save-btn">+ Simpan</button>
+        </div>
+      </div>
+
+      <div id="ai-loading" class="loading-box" hidden>
+        <span class="spinner"></span>
+        <span>Mengekstrak tugas dengan Gemini AI...</span>
+      </div>
+
+      <div id="notes-list"></div>
+    </section>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="bottom-nav" aria-label="Navigasi Mobile">
+    <button class="bottom-nav-btn active" data-tab="dashboard">
+      <span class="nav-icon">🏠</span>
+      <span>Beranda</span>
+    </button>
+    <button class="bottom-nav-btn" data-tab="tasks">
+      <span class="nav-icon">
+        ✓
+        <span class="overdue-badge" id="overdue-badge" hidden></span>
+      </span>
+      <span>Tugas</span>
+    </button>
+    <button class="bottom-nav-btn" data-tab="schedule">
+      <span class="nav-icon">📅</span>
+      <span>Jadwal</span>
+    </button>
+    <button class="bottom-nav-btn" data-tab="notes">
+      <span class="nav-icon">📝</span>
+      <span>Notes</span>
+    </button>
+  </nav>
+
+  <!-- ──────────── MODALS ──────────── -->
+
+  <!-- Task Form Modal -->
+  <div class="modal-backdrop" id="task-modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+      <div class="modal-header">
+        <h3 class="modal-title" id="task-modal-title">Tambah Tugas</h3>
+        <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      </div>
+      <div class="modal-desc" id="task-modal-desc" hidden></div>
+      <form id="task-form" class="form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="tf-mapel">Mapel</label>
+          <select id="tf-mapel" class="form-select"></select>
+          <span class="form-error" id="tf-mapel-error"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tf-judul">Judul Tugas *</label>
+          <input type="text" id="tf-judul" class="form-input" placeholder="Mis. PR Matematika Bab 3" />
+          <span class="form-error" id="tf-judul-error"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tf-deadline">Deadline *</label>
+          <input type="datetime-local" id="tf-deadline" class="form-input" />
+          <span class="form-error" id="tf-deadline-error"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tf-status">Status</label>
+          <select id="tf-status" class="form-select">
+            <option value="todo">Belum dikerjakan</option>
+            <option value="in_progress">Sedang dikerjakan</option>
+            <option value="done">Selesai</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="tf-catatan">Catatan (opsional)</label>
+          <textarea id="tf-catatan" class="form-textarea" rows="3" placeholder="Detail tambahan..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeTaskModal()">Batal</button>
+          <button type="submit" class="btn btn-primary" id="task-form-submit">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Schedule Form Modal -->
+  <div class="modal-backdrop" id="schedule-modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
+      <div class="modal-header">
+        <h3 class="modal-title" id="schedule-modal-title">Tambah Jadwal</h3>
+        <button class="modal-close" onclick="closeScheduleModal()">✕</button>
+      </div>
+      <form id="schedule-form" class="form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="sf-day">Hari</label>
+          <select id="sf-day" class="form-select">
+            <option value="1">Senin</option>
+            <option value="2">Selasa</option>
+            <option value="3">Rabu</option>
+            <option value="4">Kamis</option>
+            <option value="5">Jumat</option>
+            <option value="6">Sabtu</option>
+            <option value="0">Minggu</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="sf-start">Jam Mulai</label>
+            <input type="time" id="sf-start" class="form-input" value="07:00" />
+            <span class="form-error" id="sf-start-error"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sf-end">Jam Selesai</label>
+            <input type="time" id="sf-end" class="form-input" value="08:30" />
+            <span class="form-error" id="sf-end-error"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="sf-mapel">Mapel *</label>
+          <select id="sf-mapel" class="form-select"></select>
+          <span class="form-error" id="sf-mapel-error"></span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="sf-ruangan">Ruangan</label>
+            <input type="text" id="sf-ruangan" class="form-input" placeholder="Mis. R. 9A" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sf-guru">Guru</label>
+            <input type="text" id="sf-guru" class="form-input" placeholder="Mis. Bu Sari" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeScheduleModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Override Form Modal -->
+  <div class="modal-backdrop" id="override-modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="override-modal-title">
+      <div class="modal-header">
+        <h3 class="modal-title" id="override-modal-title">Tambah Pengecualian</h3>
+        <button class="modal-close" onclick="closeOverrideModal()">✕</button>
+      </div>
+      <form id="override-form" class="form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="of-type">Tipe</label>
+          <select id="of-type" class="form-select">
+            <option value="replace">Diganti</option>
+            <option value="cancel">Libur</option>
+            <option value="extra">Tambahan</option>
+          </select>
+          <span class="hint-text" id="of-type-hint">Ganti pelajaran pada tanggal ini.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="of-date">Tanggal *</label>
+          <input type="date" id="of-date" class="form-input" />
+          <span class="form-error" id="of-date-error"></span>
+        </div>
+        <div id="of-details">
+          <div class="form-group">
+            <label class="form-label" for="of-mapel">Mapel *</label>
+            <select id="of-mapel" class="form-select"></select>
+            <span class="form-error" id="of-mapel-error"></span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="of-start">Jam Mulai</label>
+              <input type="time" id="of-start" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="of-end">Jam Selesai</label>
+              <input type="time" id="of-end" class="form-input" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="of-ruangan">Ruangan</label>
+              <input type="text" id="of-ruangan" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="of-guru">Guru</label>
+              <input type="text" id="of-guru" class="form-input" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="of-ket">Keterangan (opsional)</label>
+          <textarea id="of-ket" class="form-textarea" rows="2" placeholder="Mis. Libur — rapat guru"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeOverrideModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal-backdrop" id="confirm-modal-backdrop" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirm-title">Konfirmasi</h3>
+      </div>
+      <p class="confirm-desc" id="confirm-desc"></p>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeConfirmModal()">Batal</button>
+        <button class="btn btn-danger" id="confirm-ok-btn">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
