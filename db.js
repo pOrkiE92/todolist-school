@@ -17,8 +17,9 @@ if (!fs.existsSync(dataDir)) {
 
 const db = new DatabaseSync(DB_PATH);
 
-// Aktifkan WAL mode dan foreign keys
-db.exec("PRAGMA journal_mode = WAL;");
+// Aktifkan journal_mode DELETE dan synchronous NORMAL (aman untuk Termux/PRoot)
+db.exec("PRAGMA journal_mode = DELETE;");
+db.exec("PRAGMA synchronous = NORMAL;");
 db.exec("PRAGMA foreign_keys = ON;");
 
 // ─────────────────────────────────────────────
@@ -67,16 +68,21 @@ db.exec(`
     status     TEXT NOT NULL DEFAULT 'raw'
                CHECK(status IN ('raw', 'converted'))
   );
+
+  CREATE TABLE IF NOT EXISTS _meta (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+  );
 `);
 
 // ─────────────────────────────────────────────
-// SEED INITIAL DATA (JIKA DATABASE MASIH KOSONG)
+// SEED INITIAL DATA (HANYA SEKALI SAAT DATABASE BARU)
 // Sesuai PRD §13 Mock Data
 // ─────────────────────────────────────────────
 
-const taskCount = db.prepare("SELECT COUNT(*) as count FROM tasks").get().count;
+const isSeeded = db.prepare("SELECT value FROM _meta WHERE key = 'seeded'").get();
 
-if (taskCount === 0) {
+if (!isSeeded) {
   const at = (dayOffset, hour, minute = 0) => {
     const d = new Date();
     d.setDate(d.getDate() + dayOffset);
@@ -88,7 +94,7 @@ if (taskCount === 0) {
 
   // 1. Seed Tasks
   const insertTask = db.prepare(`
-    INSERT INTO tasks (id, mapel, judul, deadline, status, catatan, created_at, updated_at)
+    INSERT OR IGNORE INTO tasks (id, mapel, judul, deadline, status, catatan, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
@@ -109,7 +115,7 @@ if (taskCount === 0) {
 
   // 2. Seed Weekly Schedule (Senin = 1 s/d Jumat = 5)
   const insertSchedule = db.prepare(`
-    INSERT INTO schedule (id, day_of_week, start_time, end_time, mapel, ruangan, guru)
+    INSERT OR IGNORE INTO schedule (id, day_of_week, start_time, end_time, mapel, ruangan, guru)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
@@ -133,7 +139,7 @@ if (taskCount === 0) {
 
   // 3. Seed Overrides
   const insertOverride = db.prepare(`
-    INSERT INTO schedule_override (id, date, type, mapel, start_time, end_time, ruangan, guru, keterangan)
+    INSERT OR IGNORE INTO schedule_override (id, date, type, mapel, start_time, end_time, ruangan, guru, keterangan)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
@@ -159,7 +165,7 @@ if (taskCount === 0) {
 
   // 4. Seed Quick Notes
   const insertNote = db.prepare(`
-    INSERT INTO quicknotes (id, teks, created_at, status)
+    INSERT OR IGNORE INTO quicknotes (id, teks, created_at, status)
     VALUES (?, ?, ?, ?)
   `);
 
@@ -172,6 +178,9 @@ if (taskCount === 0) {
   for (const n of initialNotes) {
     insertNote.run(n.id, n.teks, n.created_at, n.status);
   }
+
+  // Tandai sudah di-seed agar tidak pernah dijalankan ulang
+  db.prepare("INSERT OR REPLACE INTO _meta (key, value) VALUES ('seeded', '1')").run();
 }
 
 module.exports = db;

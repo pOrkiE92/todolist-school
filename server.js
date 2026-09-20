@@ -48,8 +48,31 @@ app.use((err, req, res, _next) => {
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`\n✅ Todolist Tugas Sekolah berjalan di http://localhost:${PORT}`);
   console.log(`   Timezone : Asia/Jakarta (WIB +07:00)`);
   console.log(`   Gemini AI: ${process.env.GEMINI_API_KEY ? "✓ Terkonfigurasi" : "✗ Tidak ada API key (AI dinonaktifkan)"}\n`);
 });
+
+// ─── Graceful Shutdown ────────────────────────────────────────────────────────
+// Memastikan semua write SQLite ter-flush dan database ditutup saat service di-terminate
+const db = require("./db");
+
+function gracefulShutdown(signal) {
+  console.log(`\n[SHUTDOWN] Sinyal ${signal} diterima. Menutup koneksi database...`);
+  try {
+    db.close();
+    console.log("[SHUTDOWN] Koneksi database SQLite berhasil ditutup.");
+  } catch (err) {
+    console.error("[SHUTDOWN] Gagal menutup database:", err.message);
+  }
+  server.close(() => {
+    console.log("[SHUTDOWN] Server Express berhasil dihentikan.");
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(0), 1500).unref();
+}
+
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+
