@@ -78,8 +78,10 @@ const I18N = {
     time_format_24: "24 Jam (14:30)",
     time_format_12: "12 Jam (02:30 PM)",
     settings_data_title: "Cadangan Data",
-    settings_data_desc: "Unduh salinan data tugas dan jadwal Anda sebagai file JSON",
+    settings_data_desc: "Unduh atau pulihkan salinan data tugas dan jadwal Anda sebagai file JSON",
     btn_export_data: "Ekspor Data (JSON)",
+    btn_import_data: "Impor Data (JSON)",
+    import_modal_title: "Impor Data Cadangan",
     settings_about_title: "Tentang Aplikasi",
     about_version: "Versi",
     about_database: "Database",
@@ -101,6 +103,7 @@ const I18N = {
     toast_note_deleted: "Catatan berhasil dihapus",
     toast_settings_saved: "Pengaturan berhasil disimpan",
     toast_data_exported: "Data berhasil diekspor",
+    toast_data_imported: "Data cadangan berhasil dipulihkan",
   },
   en: {
     nav_dashboard: "Dashboard",
@@ -166,8 +169,10 @@ const I18N = {
     time_format_24: "24-Hour (14:30)",
     time_format_12: "12-Hour (02:30 PM)",
     settings_data_title: "Data Backup",
-    settings_data_desc: "Download a backup copy of your tasks and schedule as a JSON file",
+    settings_data_desc: "Download or restore a backup copy of your tasks and schedule as a JSON file",
     btn_export_data: "Export Data (JSON)",
+    btn_import_data: "Import Data (JSON)",
+    import_modal_title: "Import Data Backup",
     settings_about_title: "About Application",
     about_version: "Version",
     about_database: "Database",
@@ -189,6 +194,7 @@ const I18N = {
     toast_note_deleted: "Note deleted successfully",
     toast_settings_saved: "Settings saved successfully",
     toast_data_exported: "Data exported successfully",
+    toast_data_imported: "Backup data restored successfully",
   }
 };
 
@@ -333,18 +339,47 @@ function fromInputValue(val) {
   return new Date(val).toISOString();
 }
 
-// ──────────── TOAST ────────────
+const MAX_VISIBLE_TOASTS = 2;
+
+function dismissToast(el) {
+  if (!el || el._isDismissing) return;
+  el._isDismissing = true;
+  el.classList.add("toast-out");
+  setTimeout(() => {
+    if (el.parentNode) el.remove();
+  }, 220);
+}
+
 function toast(msg, type = "success") {
   const container = document.getElementById("toast-container");
   if (!container) return;
+
+  const exiting = container.querySelectorAll(".toast.toast-out");
+  if (exiting.length > 0) {
+    exiting.forEach((old) => old.remove());
+  }
+
+  const activeToasts = Array.from(container.children).filter((el) => !el._isDismissing);
+  if (activeToasts.length >= MAX_VISIBLE_TOASTS) {
+    const overflowCount = activeToasts.length - MAX_VISIBLE_TOASTS + 1;
+    for (let i = 0; i < overflowCount; i++) {
+      dismissToast(activeToasts[i]);
+    }
+  }
+
   const t = document.createElement("div");
   t.className = `toast toast-${type}`;
-  t.innerHTML = `<span>${type === "error" ? "⚠" : "✓"}</span><span>${msg}</span>`;
+  t.innerHTML = `<span class="toast-icon">${type === "error" ? "⚠" : "✓"}</span><span class="toast-msg">${escapeHtml(msg)}</span>`;
   container.appendChild(t);
-  setTimeout(() => {
-    t.style.opacity = "0";
-    setTimeout(() => t.remove(), 200);
-  }, 2800);
+
+  const timer = setTimeout(() => {
+    dismissToast(t);
+  }, 2200);
+
+  t.onclick = () => {
+    clearTimeout(timer);
+    dismissToast(t);
+  };
 }
 
 // ──────────── TABS NAVIGATION ────────────
@@ -1482,6 +1517,101 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  let pendingBackupData = null;
+
+  function handleImportFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const data = parsed.data || parsed;
+        if (!data || typeof data !== "object") {
+          throw new Error("Struktur file cadangan tidak dikenali");
+        }
+
+        const tasksCount = Array.isArray(data.tasks) ? data.tasks.length : 0;
+        const schedCount = Array.isArray(data.schedules) ? data.schedules.length : 0;
+        const ovrCount = Array.isArray(data.overrides) ? data.overrides.length : 0;
+        const notesCount = Array.isArray(data.notes) ? data.notes.length : 0;
+
+        if (tasksCount === 0 && schedCount === 0 && ovrCount === 0 && notesCount === 0) {
+          throw new Error("File cadangan kosong atau tidak berisi data yang sesuai");
+        }
+
+        pendingBackupData = parsed;
+        openImportModal({ tasksCount, schedCount, ovrCount, notesCount });
+      } catch (err) {
+        toast(`Gagal membaca file: ${err.message}`, "error");
+      } finally {
+        event.target.value = "";
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function openImportModal(counts) {
+    const summary = document.getElementById("import-modal-summary");
+    if (summary) {
+      summary.textContent = `Ditemukan ${counts.tasksCount} tugas, ${counts.schedCount} jadwal, ${counts.ovrCount} pengecualian, dan ${counts.notesCount} catatan dalam file cadangan.`;
+    }
+    const backdrop = document.getElementById("import-modal-backdrop");
+    if (backdrop) {
+      backdrop.hidden = false;
+      backdrop.style.display = "flex";
+    }
+  }
+
+  function closeImportModal() {
+    pendingBackupData = null;
+    const backdrop = document.getElementById("import-modal-backdrop");
+    if (backdrop) {
+      backdrop.hidden = true;
+      backdrop.style.display = "none";
+    }
+  }
+
+  async function executeImport() {
+    if (!pendingBackupData) return;
+    const submitBtn = document.getElementById("import-submit-btn");
+    const modeSelect = document.getElementById("import-mode-select");
+    const mode = modeSelect ? modeSelect.value : "merge";
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Mengimpor...";
+    }
+
+    try {
+      const res = await api("/settings/import", {
+        method: "POST",
+        body: { backup: pendingBackupData, mode },
+      });
+
+      closeImportModal();
+
+      const counts = res.imported || {};
+      toast(`Data dipulihkan: ${counts.tasks || 0} tugas, ${counts.schedules || 0} jadwal`);
+
+      loadDashboard();
+      if (currentTab === "tasks") loadTasks();
+      if (currentTab === "schedule") {
+        loadSchedule();
+        loadOverrides();
+      }
+      if (currentTab === "notes") loadNotes();
+    } catch (err) {
+      toast(`Gagal mengimpor: ${err.message}`, "error");
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Impor Sekarang";
+      }
+    }
+  }
+
   async function initSettingsFromServer() {
     try {
       const settings = await api("/settings");
@@ -1511,6 +1641,9 @@ document.addEventListener("DOMContentLoaded", () => {
   window.setAppLanguage = setAppLanguage;
   window.setAppTimeFormat = setAppTimeFormat;
   window.exportAppData = exportAppData;
+  window.handleImportFile = handleImportFile;
+  window.closeImportModal = closeImportModal;
+  window.executeImport = executeImport;
 
   // Apply current preferences
   document.documentElement.setAttribute("data-theme", currentTheme);

@@ -61,4 +61,118 @@ router.put("/", (req, res) => {
   }
 });
 
+// ─── POST /api/settings/import ──────────────────────────────────────────────────
+router.post("/import", (req, res) => {
+  try {
+    const payload = req.body.backup || req.body;
+    const mode = req.body.mode === "replace" ? "replace" : "merge";
+
+    const data = payload.data || payload;
+    if (!data || typeof data !== "object") {
+      return res.status(400).json({ error: "Format file cadangan tidak valid" });
+    }
+
+    const tasks = Array.isArray(data.tasks) ? data.tasks : [];
+    const schedules = Array.isArray(data.schedules) ? data.schedules : [];
+    const overrides = Array.isArray(data.overrides) ? data.overrides : [];
+    const notes = Array.isArray(data.notes) ? data.notes : [];
+
+    db.exec("BEGIN TRANSACTION;");
+    try {
+      if (mode === "replace") {
+        db.exec("DELETE FROM tasks;");
+        db.exec("DELETE FROM schedule;");
+        db.exec("DELETE FROM schedule_override;");
+        db.exec("DELETE FROM quicknotes;");
+      }
+
+      const insertTask = db.prepare(`
+        INSERT OR REPLACE INTO tasks (id, mapel, judul, deadline, status, catatan, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      for (const t of tasks) {
+        if (!t.id || !t.judul || !t.deadline) continue;
+        insertTask.run(
+          t.id,
+          t.mapel || "Umum",
+          t.judul,
+          t.deadline,
+          ["todo", "in_progress", "done"].includes(t.status) ? t.status : "todo",
+          t.catatan || null,
+          t.created_at || new Date().toISOString(),
+          t.updated_at || new Date().toISOString()
+        );
+      }
+
+      const insertSched = db.prepare(`
+        INSERT OR REPLACE INTO schedule (id, day_of_week, start_time, end_time, mapel, ruangan, guru)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+      for (const s of schedules) {
+        if (!s.id || s.day_of_week === undefined || !s.start_time || !s.end_time || !s.mapel) continue;
+        insertSched.run(
+          s.id,
+          Number(s.day_of_week),
+          s.start_time,
+          s.end_time,
+          s.mapel,
+          s.ruangan || null,
+          s.guru || null
+        );
+      }
+
+      const insertOvr = db.prepare(`
+        INSERT OR REPLACE INTO schedule_override (id, date, type, mapel, start_time, end_time, ruangan, guru, keterangan)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      for (const o of overrides) {
+        if (!o.id || !o.date || !o.type) continue;
+        insertOvr.run(
+          o.id,
+          o.date,
+          o.type,
+          o.mapel || null,
+          o.start_time || null,
+          o.end_time || null,
+          o.ruangan || null,
+          o.guru || null,
+          o.keterangan || null
+        );
+      }
+
+      const insertNote = db.prepare(`
+        INSERT OR REPLACE INTO quicknotes (id, teks, created_at, status)
+        VALUES (?, ?, ?, ?)
+      `);
+      for (const n of notes) {
+        if (!n.id || !n.teks) continue;
+        insertNote.run(
+          n.id,
+          n.teks,
+          n.created_at || new Date().toISOString(),
+          n.status === "converted" ? "converted" : "raw"
+        );
+      }
+
+      db.exec("COMMIT;");
+
+      res.json({
+        success: true,
+        mode,
+        imported: {
+          tasks: tasks.length,
+          schedules: schedules.length,
+          overrides: overrides.length,
+          notes: notes.length,
+        },
+      });
+    } catch (txErr) {
+      db.exec("ROLLBACK;");
+      throw txErr;
+    }
+  } catch (err) {
+    res.status(500).json({ error: "Gagal mengimpor data: " + err.message });
+  }
+});
+
 module.exports = router;
