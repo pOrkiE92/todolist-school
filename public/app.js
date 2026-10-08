@@ -27,17 +27,41 @@ const I18N = {
     dash_all_tasks: "Semua tugas ›",
     dash_notes_title: "Catatan Cepat",
     dash_open_notes: "Buka notes ›",
+    dash_notes_count: "Buka notes ({n}) ›",
     dash_note_placeholder: "Catat sesuatu...",
     dash_note_hint: "Enter untuk simpan",
     btn_save: "+ Simpan",
 
+    empty_today_sched_title: "Tidak ada jadwal hari ini",
+    empty_today_sched_sub: "Tidak ada mata pelajaran yang terjadwal. Nikmati waktu luangmu!",
+    empty_tasks_title: "Semua tugas beres!",
+    empty_tasks_sub: "Tidak ada tugas mendesak atau yang belum selesai saat ini.",
+    empty_tasks_filter_title: "Tidak ada tugas ditemukan",
+    empty_tasks_filter_sub: "Coba sesuaikan filter atau tambahkan tugas baru.",
+    empty_schedule_day_title: "Belum ada jadwal hari {day}",
+    empty_schedule_day_sub: "Tambahkan jadwal pelajaran rutin untuk hari ini.",
+    empty_overrides_title: "Belum ada pengecualian jadwal",
+    empty_overrides_sub: "Tambahkan hari libur, jadwal pengganti, atau kelas ekstra.",
+    empty_notes_title: "Belum ada catatan",
+    empty_notes_sub: "Tulis apa pun yang sedang kepikiran di atas untuk disimpan.",
+
+    overdue_banner: "{n} tugas lewat tenggat: {titles}",
+    badge_overdue_prefix: "⚠ Terlambat · ",
+    badge_deadline_prefix: "🕒 ",
+    badge_converted: "✓ Jadi tugas",
+    subject_general: "Umum",
+    holiday_today: "Libur hari ini",
+
     tasks_title: "Daftar Tugas",
     tasks_sub: "Kelola tenggat waktu dan status pengerjaan",
     btn_add_task: "+ Tambah",
-    filter_all_status: "Semua status",
-    filter_all_mapel: "Semua mapel",
-    filter_deadline_asc: "Deadline: terdekat",
-    filter_deadline_desc: "Deadline: terjauh",
+    lbl_filter_status: "Status",
+    lbl_filter_mapel: "Mapel",
+    lbl_filter_sort: "Urutan",
+    filter_all_status: "Semua Status",
+    filter_all_mapel: "Semua Mapel",
+    filter_deadline_asc: "Deadline Terdekat",
+    filter_deadline_desc: "Deadline Terjauh",
     status_todo: "Belum dikerjakan",
     status_in_progress: "Sedang dikerjakan",
     status_done: "Selesai",
@@ -46,17 +70,102 @@ const I18N = {
     schedule_title: "Jadwal Pelajaran",
     schedule_sub: "Jadwal mingguan dan penyesuaian khusus",
     tab_weekly: "Jadwal Mingguan",
-    tab_overrides: "Pengecualian / Override",
+    tab_overrides: "Pengecualian",
     btn_add_schedule: "+ Tambah Jadwal",
     btn_add_override: "+ Tambah Pengecualian",
+    overrides_help: "Perubahan jadwal pada tanggal tertentu. Jadwal mingguan dasar tetap utuh.",
 
     override_replace: "Diganti",
     override_cancel: "Libur",
     override_extra: "Tambahan",
 
+    meta_subject: "Mapel",
+    meta_time: "Waktu",
+    meta_room: "Ruang",
+    meta_teacher: "Guru",
+
     notes_title: "Quick Notes",
-    notes_sub: "Catat tugas atau info cepat, konversi jadi task kapan saja",
+    notes_sub: "Brain dump — tulis apa pun tanpa struktur wajib",
     notes_placeholder: "Tulis catatan atau instruksi tugas di sini...",
+    ai_extracting: "Mengekstrak tugas dengan Gemini AI...",
+    btn_convert_task: "+ Jadikan Tugas",
+    btn_convert_ai: "✨ Konversi AI",
+
+    modal_add_task: "Tambah Tugas",
+    modal_edit_task: "Edit Tugas",
+    modal_add_schedule: "Tambah Jadwal",
+    modal_edit_schedule: "Edit Jadwal",
+    modal_add_override: "Tambah Pengecualian",
+    modal_edit_override: "Edit Pengecualian",
+    modal_confirm_ai_title: "Konfirmasi Hasil AI",
+    modal_confirm_ai_desc: "Hasil analisis Gemini AI. Periksa dan edit sebelum disimpan.",
+    modal_convert_note_title: "Jadikan Tugas",
+    modal_convert_note_desc: "Lengkapi data tugas dari catatan cepat.",
+
+    lbl_subject: "Mapel",
+    lbl_task_title: "Judul Tugas *",
+    lbl_deadline: "Deadline *",
+    lbl_notes_opt: "Catatan (opsional)",
+    lbl_day: "Hari",
+    lbl_start_time: "Jam Mulai",
+    lbl_end_time: "Jam Selesai",
+    lbl_room: "Ruangan",
+    lbl_teacher: "Guru",
+    lbl_type: "Tipe",
+    lbl_date_req: "Tanggal *",
+
+    override_hint_cancel: "Tandai tanggal ini libur (semua jadwal ditiadakan).",
+    override_hint_replace: "Ganti pelajaran pada tanggal ini.",
+    override_hint_extra: "Tambahkan kelas ekstra pada tanggal ini.",
+
+    confirm_delete_title: "Konfirmasi",
+    confirm_delete_task_title: "Hapus Tugas?",
+    confirm_delete_task_desc: 'Tugas "{title}" akan dihapus secara permanen.',
+    confirm_delete_schedule_title: "Hapus Jadwal?",
+    confirm_delete_schedule_desc: "Jadwal pelajaran ini akan dihapus.",
+    confirm_delete_override_title: "Hapus Pengecualian?",
+    confirm_delete_override_desc: "Pengecualian jadwal ini akan dihapus.",
+    confirm_delete_note_title: "Hapus Catatan?",
+    confirm_delete_note_desc: "Catatan ini akan dihapus permanen.",
+
+    btn_cancel: "Batal",
+    btn_delete: "Hapus",
+    btn_edit: "Edit",
+    btn_save_form: "Simpan",
+    btn_update_form: "Perbarui",
+    btn_confirm_save: "Konfirmasi & Simpan",
+    overdue_alert_sub: "Selesaikan sebelum bertambah.",
+    btn_view: "Lihat",
+    about_desc: "To Do List Tugas & Jadwal Sekolah",
+    placeholder_task_title: "Mis. PR Matematika Bab 3",
+    placeholder_task_notes: "Detail tambahan...",
+    placeholder_room: "Mis. R. 9A",
+    placeholder_teacher: "Mis. Bu Sari",
+    placeholder_override_notes: "Mis. Libur — rapat guru",
+    err_load_tasks: "Gagal memuat tugas",
+    err_load_schedule: "Gagal memuat jadwal",
+    err_load_overrides: "Gagal memuat pengecualian",
+    err_load_notes: "Gagal memuat catatan",
+    err_update_status: "Gagal mengubah status",
+    err_open_task: "Gagal membuka tugas",
+    err_delete: "Gagal menghapus",
+    err_save_task: "Gagal menyimpan tugas",
+    err_save_schedule: "Gagal menyimpan jadwal",
+    err_save_override: "Gagal menyimpan pengecualian",
+    err_save_note: "Gagal menyimpan catatan",
+    err_read_file: "Gagal membaca file",
+    err_import: "Gagal mengimpor",
+    err_export: "Gagal mengekspor data",
+    err_ai_convert: "AI Convert gagal",
+    toast_import_summary: "Data dipulihkan: {tasks} tugas, {schedules} jadwal",
+
+    import_modal_title: "Impor Data Cadangan",
+    import_modal_summary: "Ditemukan {tasks} tugas, {schedules} jadwal, {overrides} pengecualian, dan {notes} catatan dalam file cadangan.",
+    import_mode_label: "Metode Impor",
+    import_mode_merge: "Gabungkan (Pertahankan data yang ada)",
+    import_mode_replace: "Ganti Total (Timpa seluruh data)",
+    btn_import_now: "Impor Sekarang",
+    btn_importing: "Mengimpor...",
 
     settings_title: "Pengaturan",
     settings_subtitle: "Kustomisasi tampilan, warna aksen, dan preferensi aplikasi",
@@ -71,6 +180,7 @@ const I18N = {
     theme_light: "Terang",
     theme_dark: "Gelap",
     theme_system: "Sistem",
+    theme_system_suffix: "Otomatis",
     settings_lang_title: "Bahasa & Format",
     settings_lang_desc: "Pilih bahasa pengantar antarmuka dan format waktu",
     settings_lang_label: "Bahasa Antarmuka",
@@ -81,7 +191,6 @@ const I18N = {
     settings_data_desc: "Unduh atau pulihkan salinan data tugas dan jadwal Anda sebagai file JSON",
     btn_export_data: "Ekspor Data (JSON)",
     btn_import_data: "Impor Data (JSON)",
-    import_modal_title: "Impor Data Cadangan",
     settings_about_title: "Tentang Aplikasi",
     about_version: "Versi",
     about_database: "Database",
@@ -118,17 +227,41 @@ const I18N = {
     dash_all_tasks: "All tasks ›",
     dash_notes_title: "Quick Notes",
     dash_open_notes: "Open notes ›",
+    dash_notes_count: "Open notes ({n}) ›",
     dash_note_placeholder: "Note something down...",
     dash_note_hint: "Press Enter to save",
     btn_save: "+ Save",
 
+    empty_today_sched_title: "No schedule today",
+    empty_today_sched_sub: "No subjects scheduled for today. Enjoy your free time!",
+    empty_tasks_title: "All tasks done!",
+    empty_tasks_sub: "No urgent or unfinished tasks right now.",
+    empty_tasks_filter_title: "No tasks found",
+    empty_tasks_filter_sub: "Try adjusting filters or add a new task.",
+    empty_schedule_day_title: "No schedule on {day}",
+    empty_schedule_day_sub: "Add recurring school schedule for this day.",
+    empty_overrides_title: "No schedule exceptions yet",
+    empty_overrides_sub: "Add holidays, replacement classes, or extra classes.",
+    empty_notes_title: "No notes yet",
+    empty_notes_sub: "Write anything on your mind above to save it.",
+
+    overdue_banner: "{n} tasks overdue: {titles}",
+    badge_overdue_prefix: "⚠ Overdue · ",
+    badge_deadline_prefix: "🕒 ",
+    badge_converted: "✓ Converted to task",
+    subject_general: "General",
+    holiday_today: "Holiday today",
+
     tasks_title: "Task List",
     tasks_sub: "Manage deadlines and task progress",
     btn_add_task: "+ Add Task",
-    filter_all_status: "All statuses",
-    filter_all_mapel: "All subjects",
-    filter_deadline_asc: "Deadline: Earliest",
-    filter_deadline_desc: "Deadline: Latest",
+    lbl_filter_status: "Status",
+    lbl_filter_mapel: "Subject",
+    lbl_filter_sort: "Order",
+    filter_all_status: "All Statuses",
+    filter_all_mapel: "All Subjects",
+    filter_deadline_asc: "Earliest Deadline",
+    filter_deadline_desc: "Latest Deadline",
     status_todo: "To Do",
     status_in_progress: "In Progress",
     status_done: "Done",
@@ -137,17 +270,102 @@ const I18N = {
     schedule_title: "Class Schedule",
     schedule_sub: "Weekly recurring schedule and exceptions",
     tab_weekly: "Weekly Schedule",
-    tab_overrides: "Overrides / Exceptions",
+    tab_overrides: "Exceptions",
     btn_add_schedule: "+ Add Schedule",
-    btn_add_override: "+ Add Override",
+    btn_add_override: "+ Add Exception",
+    overrides_help: "Schedule modifications on specific dates. Base weekly schedule remains intact.",
 
     override_replace: "Replaced",
     override_cancel: "Holiday",
     override_extra: "Extra Class",
 
+    meta_subject: "Subject",
+    meta_time: "Time",
+    meta_room: "Room",
+    meta_teacher: "Teacher",
+
     notes_title: "Quick Notes",
-    notes_sub: "Capture quick thoughts or homework info, convert to tasks anytime",
+    notes_sub: "Brain dump — write anything without strict structure",
     notes_placeholder: "Write notes or homework instructions here...",
+    ai_extracting: "Extracting task with Gemini AI...",
+    btn_convert_task: "+ Make Task",
+    btn_convert_ai: "✨ AI Convert",
+
+    modal_add_task: "Add Task",
+    modal_edit_task: "Edit Task",
+    modal_add_schedule: "Add Schedule",
+    modal_edit_schedule: "Edit Schedule",
+    modal_add_override: "Add Exception",
+    modal_edit_override: "Edit Exception",
+    modal_confirm_ai_title: "Confirm AI Output",
+    modal_confirm_ai_desc: "Gemini AI analysis result. Review and edit before saving.",
+    modal_convert_note_title: "Make Task",
+    modal_convert_note_desc: "Complete task details from quick note.",
+
+    lbl_subject: "Subject",
+    lbl_task_title: "Task Title *",
+    lbl_deadline: "Deadline *",
+    lbl_notes_opt: "Notes (optional)",
+    lbl_day: "Day",
+    lbl_start_time: "Start Time",
+    lbl_end_time: "End Time",
+    lbl_room: "Room",
+    lbl_teacher: "Teacher",
+    lbl_type: "Type",
+    lbl_date_req: "Date *",
+
+    override_hint_cancel: "Mark this date as holiday (all classes cancelled).",
+    override_hint_replace: "Replace classes on this date.",
+    override_hint_extra: "Add an extra class on this date.",
+
+    confirm_delete_title: "Confirmation",
+    confirm_delete_task_title: "Delete Task?",
+    confirm_delete_task_desc: 'Task "{title}" will be permanently deleted.',
+    confirm_delete_schedule_title: "Delete Schedule?",
+    confirm_delete_schedule_desc: "This schedule entry will be deleted.",
+    confirm_delete_override_title: "Delete Exception?",
+    confirm_delete_override_desc: "This schedule exception will be deleted.",
+    confirm_delete_note_title: "Delete Note?",
+    confirm_delete_note_desc: "This note will be permanently deleted.",
+
+    btn_cancel: "Cancel",
+    btn_delete: "Delete",
+    btn_edit: "Edit",
+    btn_save_form: "Save",
+    btn_update_form: "Update",
+    btn_confirm_save: "Confirm & Save",
+    overdue_alert_sub: "Finish before they pile up.",
+    btn_view: "View",
+    about_desc: "School Homework & Class Schedule To Do List",
+    placeholder_task_title: "e.g. Math Homework Ch. 3",
+    placeholder_task_notes: "Additional details...",
+    placeholder_room: "e.g. Room 9A",
+    placeholder_teacher: "e.g. Mrs. Sarah",
+    placeholder_override_notes: "e.g. Holiday — teacher meeting",
+    err_load_tasks: "Failed to load tasks",
+    err_load_schedule: "Failed to load schedule",
+    err_load_overrides: "Failed to load exceptions",
+    err_load_notes: "Failed to load notes",
+    err_update_status: "Failed to change status",
+    err_open_task: "Failed to open task",
+    err_delete: "Failed to delete",
+    err_save_task: "Failed to save task",
+    err_save_schedule: "Failed to save schedule",
+    err_save_override: "Failed to save exception",
+    err_save_note: "Failed to save note",
+    err_read_file: "Failed to read file",
+    err_import: "Failed to import",
+    err_export: "Failed to export data",
+    err_ai_convert: "AI Convert failed",
+    toast_import_summary: "Data restored: {tasks} tasks, {schedules} schedules",
+
+    import_modal_title: "Import Backup Data",
+    import_modal_summary: "Found {tasks} tasks, {schedules} schedules, {overrides} exceptions, and {notes} notes in backup file.",
+    import_mode_label: "Import Mode",
+    import_mode_merge: "Merge (Keep existing data)",
+    import_mode_replace: "Replace All (Overwrite all data)",
+    btn_import_now: "Import Now",
+    btn_importing: "Importing...",
 
     settings_title: "Settings",
     settings_subtitle: "Customize appearance, accent colors, and app preferences",
@@ -162,6 +380,7 @@ const I18N = {
     theme_light: "Light",
     theme_dark: "Dark",
     theme_system: "System",
+    theme_system_suffix: "Auto",
     settings_lang_title: "Language & Format",
     settings_lang_desc: "Select interface language and time format",
     settings_lang_label: "Interface Language",
@@ -172,7 +391,6 @@ const I18N = {
     settings_data_desc: "Download or restore a backup copy of your tasks and schedule as a JSON file",
     btn_export_data: "Export Data (JSON)",
     btn_import_data: "Import Data (JSON)",
-    import_modal_title: "Import Data Backup",
     settings_about_title: "About Application",
     about_version: "Version",
     about_database: "Database",
@@ -187,9 +405,9 @@ const I18N = {
     toast_schedule_added: "Schedule added successfully",
     toast_schedule_updated: "Schedule updated successfully",
     toast_schedule_deleted: "Schedule deleted successfully",
-    toast_override_added: "Override saved successfully",
-    toast_override_updated: "Override updated successfully",
-    toast_override_deleted: "Override deleted successfully",
+    toast_override_added: "Exception saved successfully",
+    toast_override_updated: "Exception updated successfully",
+    toast_override_deleted: "Exception deleted successfully",
     toast_note_saved: "Note saved successfully",
     toast_note_deleted: "Note deleted successfully",
     toast_settings_saved: "Settings saved successfully",
@@ -313,6 +531,22 @@ function formatTime(date) {
   });
 }
 
+function formatClock(timeStr, fallback = "--") {
+  if (!timeStr) return fallback;
+  const parts = String(timeStr).split(":");
+  if (parts.length < 2) return timeStr;
+  const h = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  if (isNaN(h) || isNaN(m)) return timeStr;
+  const pad = (n) => String(n).padStart(2, "0");
+  if (currentTimeFormat === "12") {
+    const period = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return `${pad(h12)}:${pad(m)} ${period}`;
+  }
+  return `${pad(h)}:${pad(m)}`;
+}
+
 function formatDeadline(iso, now = new Date()) {
   if (!iso) return "-";
   const date = new Date(iso);
@@ -426,7 +660,7 @@ function setScheduleSubTab(sub) {
 
   const addBtn = document.getElementById("schedule-add-btn");
   if (addBtn) {
-    addBtn.textContent = isWeekly ? "+ Tambah Jadwal" : "+ Tambah Pengecualian";
+    addBtn.textContent = isWeekly ? t("btn_add_schedule") : t("btn_add_override");
     addBtn.onclick = isWeekly ? () => openScheduleModal() : () => openOverrideModal();
   }
 
@@ -479,8 +713,8 @@ async function loadDashboard() {
       if (!todaySlots || todaySlots.length === 0) {
         schedContainer.innerHTML = `
           <div class="empty-state">
-            <p class="empty-title">Tidak ada jadwal hari ini</p>
-            <p class="empty-sub">Tidak ada mata pelajaran yang terjadwal. Nikmati waktu luangmu!</p>
+            <p class="empty-title">${t("empty_today_sched_title")}</p>
+            <p class="empty-sub">${t("empty_today_sched_sub")}</p>
           </div>
         `;
       } else {
@@ -498,7 +732,9 @@ async function loadDashboard() {
         alertEl.hidden = false;
         alertEl.style.display = "flex";
         const titles = overdueList.map((t) => `"${t.judul}"`).join(", ");
-        alertText.textContent = `${overdueList.length} tugas lewat tenggat: ${titles}`;
+        alertText.textContent = t("overdue_banner")
+          .replace("{n}", overdueList.length)
+          .replace("{titles}", titles);
       } else {
         alertEl.hidden = true;
         alertEl.style.display = "none";
@@ -511,8 +747,8 @@ async function loadDashboard() {
       if (priorityTasks.length === 0) {
         tasksContainer.innerHTML = `
           <div class="empty-state">
-            <p class="empty-title">Semua tugas beres!</p>
-            <p class="empty-sub">Tidak ada tugas mendesak atau yang belum selesai saat ini.</p>
+            <p class="empty-title">${t("empty_tasks_title")}</p>
+            <p class="empty-sub">${t("empty_tasks_sub")}</p>
           </div>
         `;
       } else {
@@ -523,7 +759,7 @@ async function loadDashboard() {
     // 3. Counter link notes
     const notesLink = document.getElementById("notes-count-link");
     if (notesLink) {
-      notesLink.textContent = `Buka notes (${notes.length}) ›`;
+      notesLink.textContent = t("dash_notes_count").replace("{n}", notes.length);
     }
   } catch (err) {
     console.error("Dashboard load error:", err);
@@ -536,8 +772,8 @@ function renderEffectiveSlot(slot) {
       <div class="slot-item cancel">
         <div class="slot-body">
           <div class="slot-mapel">
-            <span>Libur hari ini</span>
-            <span class="badge badge-override-cancel">Libur</span>
+            <span>${t("holiday_today")}</span>
+            <span class="badge badge-override-cancel">${t("override_cancel")}</span>
           </div>
           ${slot.keterangan ? `<p class="help-text" style="margin-top:2px;">${escapeHtml(slot.keterangan)}</p>` : ""}
         </div>
@@ -546,14 +782,14 @@ function renderEffectiveSlot(slot) {
   }
 
   let badge = "";
-  if (slot.kind === "replace") badge = '<span class="badge badge-override-replace">Diganti</span>';
-  if (slot.kind === "extra") badge = '<span class="badge badge-override-extra">Tambahan</span>';
+  if (slot.kind === "replace") badge = `<span class="badge badge-override-replace">${t("override_replace")}</span>`;
+  if (slot.kind === "extra") badge = `<span class="badge badge-override-extra">${t("override_extra")}</span>`;
 
   return `
     <div class="slot-item">
       <div class="slot-time-badge">
-        <span class="slot-time-start">${slot.start_time || "--"}</span>
-        <span class="slot-time-end">${slot.end_time || ""}</span>
+        <span class="slot-time-start">${formatClock(slot.start_time, "--")}</span>
+        <span class="slot-time-end">${formatClock(slot.end_time, "")}</span>
       </div>
       <div class="slot-body">
         <div class="slot-mapel">
@@ -591,9 +827,9 @@ async function loadTasks() {
     if (!tasks || tasks.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <p class="empty-title">Tidak ada tugas ditemukan</p>
-          <p class="empty-sub">Coba sesuaikan filter atau tambahkan tugas baru.</p>
-          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="openTaskModal()">+ Tambah Tugas</button>
+          <p class="empty-title">${t("empty_tasks_filter_title")}</p>
+          <p class="empty-sub">${t("empty_tasks_filter_sub")}</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="openTaskModal()">${t("btn_add_task")}</button>
         </div>
       `;
       return;
@@ -601,7 +837,7 @@ async function loadTasks() {
     container.innerHTML = tasks.map((t) => renderTaskCard(t)).join("");
   } catch (err) {
     if (currentTab === "tasks") {
-      container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat tugas</p><p class="empty-sub">${err.message}</p></div>`;
+      container.innerHTML = `<div class="empty-state"><p class="empty-title">${t("err_load_tasks")}</p><p class="empty-sub">${err.message}</p></div>`;
     }
   }
 }
@@ -610,28 +846,29 @@ function renderTaskCard(task) {
   const isDone = task.status === "done";
   const isOverdue = !!task.is_overdue;
   const formattedDeadline = formatDeadline(task.deadline);
+  const subjectDisplay = task.mapel || t("subject_general");
 
   return `
     <div class="card ${isOverdue ? "overdue" : ""} ${isDone ? "done" : ""}" data-task-id="${task.id}">
       <div class="card-header-row">
         <div>
-          <span class="badge badge-mapel">📖 ${escapeHtml(task.mapel || "Umum")}</span>
+          <span class="badge badge-mapel">📖 ${escapeHtml(subjectDisplay)}</span>
           <h3 class="card-title" style="margin-top:6px;">${escapeHtml(task.judul)}</h3>
           ${task.catatan ? `<p class="card-desc" style="margin-top:4px;">${escapeHtml(task.catatan)}</p>` : ""}
         </div>
         <div style="display:flex; align-items:center; gap:4px;">
-          <button class="btn btn-ghost btn-sm" onclick="editTask('${task.id}')" title="Edit">✏</button>
-          <button class="btn btn-ghost btn-sm" onclick="confirmDeleteTask('${task.id}')" title="Hapus">🗑</button>
+          <button class="btn btn-ghost btn-sm" onclick="editTask('${task.id}')" title="${t("btn_edit")}">✏</button>
+          <button class="btn btn-ghost btn-sm" onclick="confirmDeleteTask('${task.id}')" title="${t("btn_delete")}">🗑</button>
         </div>
       </div>
       <div class="card-footer-row">
         <span class="badge-deadline ${isOverdue ? "overdue" : ""}">
-          ${isOverdue ? "⚠ Terlambat · " : "🕒 "} ${formattedDeadline}
+          ${isOverdue ? t("badge_overdue_prefix") : t("badge_deadline_prefix")} ${formattedDeadline}
         </span>
         <select class="select-sm badge-status ${task.status}" onchange="changeTaskStatus('${task.id}', this.value)">
-          <option value="todo" ${task.status === "todo" ? "selected" : ""}>Belum dikerjakan</option>
-          <option value="in_progress" ${task.status === "in_progress" ? "selected" : ""}>Sedang dikerjakan</option>
-          <option value="done" ${task.status === "done" ? "selected" : ""}>Selesai</option>
+          <option value="todo" ${task.status === "todo" ? "selected" : ""}>${t("status_todo")}</option>
+          <option value="in_progress" ${task.status === "in_progress" ? "selected" : ""}>${t("status_in_progress")}</option>
+          <option value="done" ${task.status === "done" ? "selected" : ""}>${t("status_done")}</option>
         </select>
       </div>
     </div>
@@ -656,7 +893,7 @@ async function changeTaskStatus(id, newStatus) {
       method: "PUT",
       body: { status: newStatus },
     });
-    toast(`Status diubah: ${STATUS_LABEL[newStatus]}`);
+    toast(`${t("toast_status_changed")}: ${STATUS_LABEL[newStatus]}`);
 
     const filterStatusEl = document.getElementById("filter-status");
     if (currentTab === "tasks" && filterStatusEl && filterStatusEl.value !== "all") {
@@ -668,7 +905,7 @@ async function changeTaskStatus(id, newStatus) {
     cards.forEach((card, idx) => {
       card.classList.toggle("done", prevStates[idx]);
     });
-    toast(`Gagal mengubah status: ${err.message}`, "error");
+    toast(`${t("err_update_status")}: ${err.message}`, "error");
   }
 }
 
@@ -678,7 +915,7 @@ function renderDayPills() {
   if (!container) return;
   const ordered = [1, 2, 3, 4, 5, 6, 0];
 
-  if (container.children.length > 0) {
+  if (container.children.length > 0 && container._renderedLang === currentLang) {
     const buttons = container.querySelectorAll(".day-pill");
     buttons.forEach((btn, idx) => {
       btn.classList.toggle("active", ordered[idx] === selectedDay);
@@ -686,6 +923,7 @@ function renderDayPills() {
     return;
   }
 
+  container._renderedLang = currentLang;
   const todayDow = new Date().getDay();
   container.innerHTML = ordered.map((d) => {
     const isSelected = selectedDay === d;
@@ -713,11 +951,13 @@ async function loadSchedule() {
     const list = await api(`/schedule?day=${selectedDay}`);
     if (currentTab !== "schedule" || scheduleSubTab !== "weekly" || reqId !== activeNavRequestId) return;
     if (!list || list.length === 0) {
+      const dayName = DAY_NAMES[selectedDay];
+      const emptyTitle = t("empty_schedule_day_title").replace("{day}", dayName);
       container.innerHTML = `
         <div class="empty-state">
-          <p class="empty-title">Belum ada jadwal hari ${DAY_NAMES[selectedDay]}</p>
-          <p class="empty-sub">Tambahkan jadwal pelajaran rutin untuk hari ini.</p>
-          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="openScheduleModal()">+ Tambah Jadwal</button>
+          <p class="empty-title">${emptyTitle}</p>
+          <p class="empty-sub">${t("empty_schedule_day_sub")}</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="openScheduleModal()">${t("btn_add_schedule")}</button>
         </div>
       `;
       return;
@@ -726,8 +966,8 @@ async function loadSchedule() {
     container.innerHTML = list.map((item) => `
       <div class="slot-item">
         <div class="slot-time-badge">
-          <span class="slot-time-start">${item.start_time}</span>
-          <span class="slot-time-end">${item.end_time}</span>
+          <span class="slot-time-start">${formatClock(item.start_time, "--")}</span>
+          <span class="slot-time-end">${formatClock(item.end_time, "")}</span>
         </div>
         <div class="slot-body">
           <div class="slot-mapel">${escapeHtml(item.mapel)}</div>
@@ -737,14 +977,14 @@ async function loadSchedule() {
           </div>
         </div>
         <div class="slot-actions">
-          <button class="btn btn-ghost btn-sm" onclick="editSchedule('${item.id}')" title="Edit">✏</button>
-          <button class="btn btn-ghost btn-sm" onclick="confirmDeleteSchedule('${item.id}')" title="Hapus">🗑</button>
+          <button class="btn btn-ghost btn-sm" onclick="editSchedule('${item.id}')" title="${t("btn_edit")}">✏</button>
+          <button class="btn btn-ghost btn-sm" onclick="confirmDeleteSchedule('${item.id}')" title="${t("btn_delete")}">🗑</button>
         </div>
       </div>
     `).join("");
   } catch (err) {
     if (currentTab === "schedule") {
-      container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat jadwal</p><p class="empty-sub">${err.message}</p></div>`;
+      container.innerHTML = `<div class="empty-state"><p class="empty-title">${t("err_load_schedule")}</p><p class="empty-sub">${err.message}</p></div>`;
     }
   }
 }
@@ -763,9 +1003,9 @@ async function loadOverrides() {
     if (!list || list.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <p class="empty-title">Belum ada pengecualian jadwal</p>
-          <p class="empty-sub">Tambahkan hari libur, jadwal pengganti, atau kelas ekstra.</p>
-          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="openOverrideModal()">+ Tambah Pengecualian</button>
+          <p class="empty-title">${t("empty_overrides_title")}</p>
+          <p class="empty-sub">${t("empty_overrides_sub")}</p>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="openOverrideModal()">${t("btn_add_override")}</button>
         </div>
       `;
       return;
@@ -782,20 +1022,20 @@ async function loadOverrides() {
                 ${typeBadge}
               </div>
               <p class="card-desc" style="margin-top:4px;">
-                ${escapeHtml(ovr.keterangan || (ovr.type === "cancel" ? "Libur" : ovr.mapel))}
+                ${escapeHtml(ovr.keterangan || (ovr.type === "cancel" ? t("override_cancel") : ovr.mapel))}
               </p>
             </div>
             <div style="display:flex; align-items:center; gap:4px;">
-              <button class="btn btn-ghost btn-sm" onclick="editOverride('${ovr.id}')" title="Edit">✏</button>
-              <button class="btn btn-ghost btn-sm" onclick="confirmDeleteOverride('${ovr.id}')" title="Hapus">🗑</button>
+              <button class="btn btn-ghost btn-sm" onclick="editOverride('${ovr.id}')" title="${t("btn_edit")}">✏</button>
+              <button class="btn btn-ghost btn-sm" onclick="confirmDeleteOverride('${ovr.id}')" title="${t("btn_delete")}">🗑</button>
             </div>
           </div>
           ${ovr.type !== "cancel" ? `
             <div class="slot-meta" style="border-top:1px solid var(--border); padding-top:6px; margin-top:4px;">
-              ${ovr.mapel ? `<span>Mapel: <strong>${escapeHtml(ovr.mapel)}</strong></span>` : ""}
-              ${ovr.start_time ? `<span>Waktu: ${ovr.start_time} - ${ovr.end_time}</span>` : ""}
-              ${ovr.ruangan ? `<span>Ruang: ${escapeHtml(ovr.ruangan)}</span>` : ""}
-              ${ovr.guru ? `<span>Guru: ${escapeHtml(ovr.guru)}</span>` : ""}
+              ${ovr.mapel ? `<span>${t("meta_subject")}: <strong>${escapeHtml(ovr.mapel)}</strong></span>` : ""}
+              ${ovr.start_time ? `<span>${t("meta_time")}: ${formatClock(ovr.start_time)} - ${formatClock(ovr.end_time)}</span>` : ""}
+              ${ovr.ruangan ? `<span>${t("meta_room")}: ${escapeHtml(ovr.ruangan)}</span>` : ""}
+              ${ovr.guru ? `<span>${t("meta_teacher")}: ${escapeHtml(ovr.guru)}</span>` : ""}
             </div>
           ` : ""}
         </div>
@@ -803,7 +1043,7 @@ async function loadOverrides() {
     }).join("");
   } catch (err) {
     if (currentTab === "schedule") {
-      container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat pengecualian</p><p class="empty-sub">${err.message}</p></div>`;
+      container.innerHTML = `<div class="empty-state"><p class="empty-title">${t("err_load_overrides")}</p><p class="empty-sub">${err.message}</p></div>`;
     }
   }
 }
@@ -818,8 +1058,8 @@ async function loadNotes() {
     if (!list || list.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <p class="empty-title">Belum ada catatan</p>
-          <p class="empty-sub">Tulis apa pun yang sedang kepikiran di atas untuk disimpan.</p>
+          <p class="empty-title">${t("empty_notes_title")}</p>
+          <p class="empty-sub">${t("empty_notes_sub")}</p>
         </div>
       `;
       return;
@@ -831,24 +1071,24 @@ async function loadNotes() {
           <p class="card-desc" style="color:var(--card-foreground); font-size:13px; font-weight:500;">
             ${escapeHtml(n.teks)}
           </p>
-          ${n.status === "converted" ? '<span class="badge" style="background:var(--success-light); color:#047857; flex-shrink:0;">✓ Jadi tugas</span>' : ""}
+          ${n.status === "converted" ? `<span class="badge" style="background:var(--success-light); color:#047857; flex-shrink:0;">${t("badge_converted")}</span>` : ""}
         </div>
         <p class="hint-text" style="margin-top:4px;">${formatDeadline(n.created_at)}</p>
         <div class="card-footer-row" style="margin-top:8px;">
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-outline btn-sm" onclick="convertNoteManual('${n.id}', '${escapeAttr(n.teks)}')">
-              + Jadikan Tugas
+              ${t("btn_convert_task")}
             </button>
             <button class="btn btn-outline btn-sm" style="border-color:var(--primary); color:var(--primary);" onclick="convertNoteAI('${n.id}', '${escapeAttr(n.teks)}')">
-              ✨ Konversi AI
+              ${t("btn_convert_ai")}
             </button>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="confirmDeleteNote('${n.id}')" title="Hapus">🗑</button>
+          <button class="btn btn-ghost btn-sm" onclick="confirmDeleteNote('${n.id}')" title="${t("btn_delete")}">🗑</button>
         </div>
       </div>
     `).join("");
   } catch (err) {
-    container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat catatan</p><p class="empty-sub">${err.message}</p></div>`;
+    container.innerHTML = `<div class="empty-state"><p class="empty-title">${t("err_load_notes")}</p><p class="empty-sub">${err.message}</p></div>`;
   }
 }
 
@@ -860,20 +1100,20 @@ async function saveQuickNote(teks) {
       method: "POST",
       body: { teks: clean },
     });
-    toast("Catatan tersimpan");
+    toast(t("toast_note_saved"));
     if (currentTab === "dashboard") loadDashboard();
     else loadNotes();
   } catch (err) {
-    toast(`Gagal menyimpan: ${err.message}`, "error");
+    toast(`${t("err_save_note")}: ${err.message}`, "error");
   }
 }
 
 // Convert Note: Manual
 function convertNoteManual(noteId, text) {
   openTaskModal({
-    title: "Jadikan Tugas",
-    desc: "Lengkapi data tugas dari catatan cepat.",
-    submitLabel: "Simpan Tugas",
+    title: t("modal_convert_note_title"),
+    desc: t("modal_convert_note_desc"),
+    submitLabel: t("btn_save_form"),
     sourceNoteId: noteId,
     initial: {
       judul: text.length > 60 ? text.slice(0, 60) : text,
@@ -898,9 +1138,9 @@ async function convertNoteAI(noteId, text) {
 
     // Sesuai PRD §6: AI output selalu harus melalui konfirmasi/edit user sebelum disimpan!
     openTaskModal({
-      title: "Konfirmasi Hasil AI",
-      desc: "Hasil analisis Gemini AI. Periksa dan edit sebelum disimpan.",
-      submitLabel: "Konfirmasi & Simpan",
+      title: t("modal_confirm_ai_title"),
+      desc: t("modal_confirm_ai_desc"),
+      submitLabel: t("btn_confirm_save"),
       sourceNoteId: noteId,
       initial: {
         mapel: result.mapel || "",
@@ -912,7 +1152,7 @@ async function convertNoteAI(noteId, text) {
     });
   } catch (err) {
     if (loadingEl) loadingEl.hidden = true;
-    toast(`AI Convert gagal: ${err.message}`, "error");
+    toast(`${t("err_ai_convert")}: ${err.message}`, "error");
 
     // Fallback manual per PRD §6
     setTimeout(() => {
@@ -928,7 +1168,7 @@ function openTaskModal(config = {}) {
   editingTaskId = config.id || null;
   sourceNoteIdForTask = config.sourceNoteId || null;
 
-  document.getElementById("task-modal-title").textContent = config.title || (editingTaskId ? "Edit Tugas" : "Tambah Tugas");
+  document.getElementById("task-modal-title").textContent = config.title || (editingTaskId ? t("modal_edit_task") : t("modal_add_task"));
   const descEl = document.getElementById("task-modal-desc");
   if (config.desc) {
     descEl.hidden = false;
@@ -936,7 +1176,7 @@ function openTaskModal(config = {}) {
   } else {
     descEl.hidden = true;
   }
-  document.getElementById("task-form-submit").textContent = config.submitLabel || (editingTaskId ? "Perbarui" : "Simpan");
+  document.getElementById("task-form-submit").textContent = config.submitLabel || (editingTaskId ? t("btn_update_form") : t("btn_save_form"));
 
   const initial = config.initial || {};
   document.getElementById("tf-mapel").value = initial.mapel || MAPEL_LIST[0];
@@ -960,7 +1200,7 @@ async function editTask(id) {
     const task = await api(`/tasks/${id}`);
     openTaskModal({
       id: task.id,
-      title: "Edit Tugas",
+      title: t("modal_edit_task"),
       initial: {
         mapel: task.mapel,
         judul: task.judul,
@@ -970,14 +1210,16 @@ async function editTask(id) {
       },
     });
   } catch (err) {
-    toast(`Gagal membuka tugas: ${err.message}`, "error");
+    toast(`${t("err_open_task")}: ${err.message}`, "error");
   }
 }
 
 // 2. Schedule Modal
 function openScheduleModal(initial = null) {
   editingScheduleId = initial?.id || null;
-  document.getElementById("schedule-modal-title").textContent = editingScheduleId ? "Edit Jadwal" : "Tambah Jadwal";
+  document.getElementById("schedule-modal-title").textContent = editingScheduleId ? t("modal_edit_schedule") : t("modal_add_schedule");
+  const sfSubmit = document.querySelector("#schedule-form button[type='submit']");
+  if (sfSubmit) sfSubmit.textContent = editingScheduleId ? t("btn_update_form") : t("btn_save_form");
 
   document.getElementById("sf-day").value = String(initial?.day_of_week ?? selectedDay);
   document.getElementById("sf-start").value = initial?.start_time || "07:00";
@@ -1001,14 +1243,16 @@ async function editSchedule(id) {
     const item = list.find((s) => s.id === id);
     if (item) openScheduleModal(item);
   } catch (err) {
-    toast(`Gagal memuat jadwal: ${err.message}`, "error");
+    toast(`${t("err_load_schedule")}: ${err.message}`, "error");
   }
 }
 
 // 3. Override Modal
 function openOverrideModal(initial = null) {
   editingOverrideId = initial?.id || null;
-  document.getElementById("override-modal-title").textContent = editingOverrideId ? "Edit Pengecualian" : "Tambah Pengecualian";
+  document.getElementById("override-modal-title").textContent = editingOverrideId ? t("modal_edit_override") : t("modal_add_override");
+  const ofSubmit = document.querySelector("#override-form button[type='submit']");
+  if (ofSubmit) ofSubmit.textContent = editingOverrideId ? t("btn_update_form") : t("btn_save_form");
 
   const type = initial?.type || "replace";
   document.getElementById("of-type").value = type;
@@ -1035,13 +1279,13 @@ function handleOverrideTypeChange(type) {
   const hint = document.getElementById("of-type-hint");
   if (type === "cancel") {
     details.style.display = "none";
-    hint.textContent = "Tandai tanggal ini libur (semua jadwal ditiadakan).";
+    if (hint) hint.textContent = t("override_hint_cancel");
   } else if (type === "replace") {
     details.style.display = "block";
-    hint.textContent = "Ganti pelajaran pada tanggal ini.";
+    if (hint) hint.textContent = t("override_hint_replace");
   } else {
     details.style.display = "block";
-    hint.textContent = "Tambahkan kelas ekstra pada tanggal ini.";
+    if (hint) hint.textContent = t("override_hint_extra");
   }
 }
 
@@ -1051,7 +1295,7 @@ async function editOverride(id) {
     const item = list.find((o) => o.id === id);
     if (item) openOverrideModal(item);
   } catch (err) {
-    toast(`Gagal memuat pengecualian: ${err.message}`, "error");
+    toast(`${t("err_load_overrides")}: ${err.message}`, "error");
   }
 }
 
@@ -1073,61 +1317,77 @@ function closeConfirmModal() {
 }
 
 async function confirmDeleteTask(id) {
-  let title = "Tugas";
+  let title = t("nav_tasks");
   try {
     const task = await api(`/tasks/${id}`);
     if (task && task.judul) title = task.judul;
   } catch {}
 
-  openConfirmModal("Hapus Tugas?", `Tugas "${title}" akan dihapus secara permanen.`, async () => {
-    try {
-      await api(`/tasks/${id}`, { method: "DELETE" });
-      toast("Tugas telah dihapus");
-      loadDashboard();
-      if (currentTab === "tasks") loadTasks();
-    } catch (err) {
-      toast(`Gagal menghapus: ${err.message}`, "error");
+  openConfirmModal(
+    t("confirm_delete_task_title"),
+    t("confirm_delete_task_desc").replace("{title}", title),
+    async () => {
+      try {
+        await api(`/tasks/${id}`, { method: "DELETE" });
+        toast(t("toast_task_deleted"));
+        loadDashboard();
+        if (currentTab === "tasks") loadTasks();
+      } catch (err) {
+        toast(`${t("err_delete")}: ${err.message}`, "error");
+      }
     }
-  });
+  );
 }
 
 async function confirmDeleteSchedule(id) {
-  openConfirmModal("Hapus Jadwal?", "Jadwal pelajaran ini akan dihapus.", async () => {
-    try {
-      await api(`/schedule/${id}`, { method: "DELETE" });
-      toast("Jadwal telah dihapus");
-      loadSchedule();
-      loadDashboard();
-    } catch (err) {
-      toast(`Gagal menghapus: ${err.message}`, "error");
+  openConfirmModal(
+    t("confirm_delete_schedule_title"),
+    t("confirm_delete_schedule_desc"),
+    async () => {
+      try {
+        await api(`/schedule/${id}`, { method: "DELETE" });
+        toast(t("toast_schedule_deleted"));
+        loadSchedule();
+        loadDashboard();
+      } catch (err) {
+        toast(`${t("err_delete")}: ${err.message}`, "error");
+      }
     }
-  });
+  );
 }
 
 async function confirmDeleteOverride(id) {
-  openConfirmModal("Hapus Pengecualian?", "Pengecualian jadwal ini akan dihapus.", async () => {
-    try {
-      await api(`/schedule/overrides/${id}`, { method: "DELETE" });
-      toast("Pengecualian telah dihapus");
-      loadOverrides();
-      loadDashboard();
-    } catch (err) {
-      toast(`Gagal menghapus: ${err.message}`, "error");
+  openConfirmModal(
+    t("confirm_delete_override_title"),
+    t("confirm_delete_override_desc"),
+    async () => {
+      try {
+        await api(`/schedule/overrides/${id}`, { method: "DELETE" });
+        toast(t("toast_override_deleted"));
+        loadOverrides();
+        loadDashboard();
+      } catch (err) {
+        toast(`${t("err_delete")}: ${err.message}`, "error");
+      }
     }
-  });
+  );
 }
 
 async function confirmDeleteNote(id) {
-  openConfirmModal("Hapus Catatan?", "Catatan ini akan dihapus permanen.", async () => {
-    try {
-      await api(`/quicknotes/${id}`, { method: "DELETE" });
-      toast("Catatan telah dihapus");
-      loadNotes();
-      loadDashboard();
-    } catch (err) {
-      toast(`Gagal menghapus: ${err.message}`, "error");
+  openConfirmModal(
+    t("confirm_delete_note_title"),
+    t("confirm_delete_note_desc"),
+    async () => {
+      try {
+        await api(`/quicknotes/${id}`, { method: "DELETE" });
+        toast(t("toast_note_deleted"));
+        loadNotes();
+        loadDashboard();
+      } catch (err) {
+        toast(`${t("err_delete")}: ${err.message}`, "error");
+      }
     }
-  });
+  );
 }
 
 function clearFormErrors(prefix) {
@@ -1171,8 +1431,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const populateMapel = (selectId, includeAll = false) => {
     const sel = document.getElementById(selectId);
     if (!sel) return;
-    sel.innerHTML = (includeAll ? '<option value="all">Semua Mapel</option>' : "") +
+    const curVal = sel.value;
+    sel.innerHTML = (includeAll ? `<option value="all">${t("filter_all_mapel")}</option>` : "") +
       MAPEL_LIST.map((m) => `<option value="${m}">${m}</option>`).join("");
+    if (curVal) sel.value = curVal;
   };
 
   populateMapel("filter-mapel", true);
@@ -1212,11 +1474,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let hasError = false;
       if (!judul) {
-        setFormError("tf-judul-error", "Judul tugas wajib diisi");
+        setFormError("tf-judul-error", currentLang === "en" ? "Task title is required" : "Judul tugas wajib diisi");
         hasError = true;
       }
       if (!rawDeadline) {
-        setFormError("tf-deadline-error", "Deadline wajib diisi");
+        setFormError("tf-deadline-error", currentLang === "en" ? "Deadline is required" : "Deadline wajib diisi");
         hasError = true;
       }
 
@@ -1233,10 +1495,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         if (editingTaskId) {
           await api(`/tasks/${editingTaskId}`, { method: "PUT", body: payload });
-          toast("Tugas berhasil diperbarui");
+          toast(t("toast_task_updated"));
         } else {
           await api("/tasks", { method: "POST", body: payload });
-          toast("Tugas berhasil ditambahkan");
+          toast(t("toast_task_added"));
         }
 
         // Jika tugas dibuat dari Quick Note, tandai catatan as 'converted'
@@ -1249,7 +1511,7 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (currentTab === "tasks") loadTasks();
         else if (currentTab === "notes") loadNotes();
       } catch (err) {
-        toast(`Gagal menyimpan tugas: ${err.message}`, "error");
+        toast(`${t("err_save_task")}: ${err.message}`, "error");
       }
     });
   }
@@ -1270,19 +1532,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let hasError = false;
       if (!start_time) {
-        setFormError("sf-start-error", "Jam mulai wajib");
+        setFormError("sf-start-error", currentLang === "en" ? "Start time is required" : "Jam mulai wajib");
         hasError = true;
       }
       if (!end_time) {
-        setFormError("sf-end-error", "Jam selesai wajib");
+        setFormError("sf-end-error", currentLang === "en" ? "End time is required" : "Jam selesai wajib");
         hasError = true;
       }
       if (start_time && end_time && end_time <= start_time) {
-        setFormError("sf-end-error", "Jam selesai harus setelah jam mulai");
+        setFormError("sf-end-error", currentLang === "en" ? "End time must be after start time" : "Jam selesai harus setelah jam mulai");
         hasError = true;
       }
       if (!mapel) {
-        setFormError("sf-mapel-error", "Mapel wajib");
+        setFormError("sf-mapel-error", currentLang === "en" ? "Subject is required" : "Mapel wajib");
         hasError = true;
       }
 
@@ -1300,15 +1562,15 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         if (editingScheduleId) {
           await api(`/schedule/${editingScheduleId}`, { method: "PUT", body: payload });
-          toast("Jadwal berhasil diperbarui");
+          toast(t("toast_schedule_updated"));
         } else {
           await api("/schedule", { method: "POST", body: payload });
-          toast("Jadwal berhasil ditambahkan");
+          toast(t("toast_schedule_added"));
         }
         closeScheduleModal();
         loadSchedule();
       } catch (err) {
-        toast(`Gagal menyimpan jadwal: ${err.message}`, "error");
+        toast(`${t("err_save_schedule")}: ${err.message}`, "error");
       }
     });
   }
@@ -1338,11 +1600,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let hasError = false;
       if (!date) {
-        setFormError("of-date-error", "Tanggal wajib");
+        setFormError("of-date-error", currentLang === "en" ? "Date is required" : "Tanggal wajib");
         hasError = true;
       }
       if (type !== "cancel" && !mapel) {
-        setFormError("of-mapel-error", "Mapel wajib");
+        setFormError("of-mapel-error", currentLang === "en" ? "Subject is required" : "Mapel wajib");
         hasError = true;
       }
 
@@ -1362,15 +1624,15 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         if (editingOverrideId) {
           await api(`/schedule/overrides/${editingOverrideId}`, { method: "PUT", body: payload });
-          toast("Pengecualian berhasil diperbarui");
+          toast(t("toast_override_updated"));
         } else {
           await api("/schedule/overrides", { method: "POST", body: payload });
-          toast("Pengecualian berhasil ditambahkan");
+          toast(t("toast_override_added"));
         }
         closeOverrideModal();
         loadOverrides();
       } catch (err) {
-        toast(`Gagal menyimpan pengecualian: ${err.message}`, "error");
+        toast(`${t("err_save_override")}: ${err.message}`, "error");
       }
     });
   }
@@ -1419,6 +1681,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ──────────── SETTINGS MODULE ────────────
+  function updateDayOptions() {
+    const sfDay = document.getElementById("sf-day");
+    if (!sfDay) return;
+    const curVal = sfDay.value;
+    const days = getDayNames();
+    const order = [1, 2, 3, 4, 5, 6, 0];
+    sfDay.innerHTML = order.map((dow) => `<option value="${dow}">${days[dow]}</option>`).join("");
+    if (curVal !== "") sfDay.value = curVal;
+  }
+
   function applyI18n() {
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
@@ -1432,9 +1704,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const notesInput = document.getElementById("notes-input");
     if (notesInput) notesInput.placeholder = t("notes_placeholder");
 
+    const tfJudul = document.getElementById("tf-judul");
+    if (tfJudul) tfJudul.placeholder = t("placeholder_task_title");
+    const tfCatatan = document.getElementById("tf-catatan");
+    if (tfCatatan) tfCatatan.placeholder = t("placeholder_task_notes");
+    const sfRuangan = document.getElementById("sf-ruangan");
+    if (sfRuangan) sfRuangan.placeholder = t("placeholder_room");
+    const sfGuru = document.getElementById("sf-guru");
+    if (sfGuru) sfGuru.placeholder = t("placeholder_teacher");
+    const ofKet = document.getElementById("of-ket");
+    if (ofKet) ofKet.placeholder = t("placeholder_override_notes");
+
     // Update header date
     const headerDateEl = document.getElementById("header-date");
     if (headerDateEl) headerDateEl.textContent = formatFullDate(new Date());
+
+    populateMapel("filter-mapel", true);
+    updateDayOptions();
   }
 
   function setAppTheme(theme) {
@@ -1442,20 +1728,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("app_theme", theme);
     document.documentElement.setAttribute("data-theme", theme);
 
-    document.querySelectorAll("#theme-segmented .segmented-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.getAttribute("data-theme-val") === theme);
-    });
-
-    const labelEl = document.getElementById("current-theme-label");
-    if (labelEl) {
-      const labels = {
-        light: t("theme_light"),
-        dark: t("theme_dark"),
-        system: t("theme_system") + ` (${currentLang === "en" ? "System" : "Otomatis"})`,
-      };
-      labelEl.textContent = labels[theme] || theme;
-    }
-
+    loadSettings();
     api("/settings", { method: "PUT", body: { theme } }).catch(() => {});
     toast(t("toast_settings_saved"));
   }
@@ -1465,10 +1738,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("app_accent", accent);
     document.documentElement.setAttribute("data-accent", accent);
 
-    document.querySelectorAll("#accent-grid .accent-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.getAttribute("data-accent-val") === accent);
-    });
-
+    loadSettings();
     api("/settings", { method: "PUT", body: { accent } }).catch(() => {});
     toast(t("toast_settings_saved"));
   }
@@ -1476,11 +1746,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function setAppLanguage(lang) {
     currentLang = lang;
     localStorage.setItem("app_lang", lang);
+    document.documentElement.setAttribute("lang", lang);
 
-    document.querySelectorAll("#lang-segmented .segmented-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.getAttribute("data-lang-val") === lang);
-    });
-
+    loadSettings();
     applyI18n();
     api("/settings", { method: "PUT", body: { lang } }).catch(() => {});
 
@@ -1491,7 +1759,6 @@ document.addEventListener("DOMContentLoaded", () => {
       else loadOverrides();
     }
     else if (currentTab === "notes") loadNotes();
-    else if (currentTab === "settings") loadSettings();
 
     toast(t("toast_settings_saved"));
   }
@@ -1500,10 +1767,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentTimeFormat = fmt;
     localStorage.setItem("app_time_format", fmt);
 
-    document.querySelectorAll("#time-segmented .segmented-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.getAttribute("data-time-val") === fmt);
-    });
-
+    loadSettings();
     api("/settings", { method: "PUT", body: { timeFormat: fmt } }).catch(() => {});
 
     if (currentTab === "dashboard") loadDashboard();
@@ -1523,10 +1787,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const labelEl = document.getElementById("current-theme-label");
     if (labelEl) {
+      const suffix = t("theme_system_suffix");
       const labels = {
         light: t("theme_light"),
         dark: t("theme_dark"),
-        system: t("theme_system") + ` (${currentLang === "en" ? "System" : "Otomatis"})`,
+        system: `${t("theme_system")} (${suffix})`,
       };
       labelEl.textContent = labels[currentTheme] || currentTheme;
     }
@@ -1572,7 +1837,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       toast(t("toast_data_exported"));
     } catch (err) {
-      toast(`Export failed: ${err.message}`, "error");
+      toast(`${t("err_export")}: ${err.message}`, "error");
     }
   }
 
@@ -1588,7 +1853,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const parsed = JSON.parse(e.target.result);
         const data = parsed.data || parsed;
         if (!data || typeof data !== "object") {
-          throw new Error("Struktur file cadangan tidak dikenali");
+          throw new Error(currentLang === "en" ? "Unrecognized backup file structure" : "Struktur file cadangan tidak dikenali");
         }
 
         const tasksCount = Array.isArray(data.tasks) ? data.tasks.length : 0;
@@ -1597,13 +1862,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const notesCount = Array.isArray(data.notes) ? data.notes.length : 0;
 
         if (tasksCount === 0 && schedCount === 0 && ovrCount === 0 && notesCount === 0) {
-          throw new Error("File cadangan kosong atau tidak berisi data yang sesuai");
+          throw new Error(currentLang === "en" ? "Backup file is empty or invalid" : "File cadangan kosong atau tidak berisi data yang sesuai");
         }
 
         pendingBackupData = parsed;
         openImportModal({ tasksCount, schedCount, ovrCount, notesCount });
       } catch (err) {
-        toast(`Gagal membaca file: ${err.message}`, "error");
+        toast(`${t("err_read_file")}: ${err.message}`, "error");
       } finally {
         event.target.value = "";
       }
@@ -1614,7 +1879,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function openImportModal(counts) {
     const summary = document.getElementById("import-modal-summary");
     if (summary) {
-      summary.textContent = `Ditemukan ${counts.tasksCount} tugas, ${counts.schedCount} jadwal, ${counts.ovrCount} pengecualian, dan ${counts.notesCount} catatan dalam file cadangan.`;
+      summary.textContent = t("import_modal_summary")
+        .replace("{tasks}", counts.tasksCount)
+        .replace("{schedules}", counts.schedCount)
+        .replace("{overrides}", counts.ovrCount)
+        .replace("{notes}", counts.notesCount);
     }
     const backdrop = document.getElementById("import-modal-backdrop");
     if (backdrop) {
@@ -1640,7 +1909,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = "Mengimpor...";
+      submitBtn.textContent = t("btn_importing");
     }
 
     try {
@@ -1652,7 +1921,7 @@ document.addEventListener("DOMContentLoaded", () => {
       closeImportModal();
 
       const counts = res.imported || {};
-      toast(`Data dipulihkan: ${counts.tasks || 0} tugas, ${counts.schedules || 0} jadwal`);
+      toast(t("toast_import_summary").replace("{tasks}", counts.tasks || 0).replace("{schedules}", counts.schedules || 0));
 
       loadDashboard();
       if (currentTab === "tasks") loadTasks();
@@ -1662,11 +1931,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       if (currentTab === "notes") loadNotes();
     } catch (err) {
-      toast(`Gagal mengimpor: ${err.message}`, "error");
+      toast(`${t("err_import")}: ${err.message}`, "error");
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Impor Sekarang";
+        submitBtn.textContent = t("btn_import_now");
       }
     }
   }
@@ -1675,20 +1944,40 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const settings = await api("/settings");
       if (settings) {
+        let changed = false;
         if (settings.theme && !localStorage.getItem("app_theme")) {
-          setAppTheme(settings.theme);
+          currentTheme = settings.theme;
+          localStorage.setItem("app_theme", settings.theme);
+          document.documentElement.setAttribute("data-theme", settings.theme);
+          changed = true;
         }
         if (settings.accent && !localStorage.getItem("app_accent")) {
-          setAppAccent(settings.accent);
+          currentAccent = settings.accent;
+          localStorage.setItem("app_accent", settings.accent);
+          document.documentElement.setAttribute("data-accent", settings.accent);
+          changed = true;
         }
         if (settings.lang && !localStorage.getItem("app_lang")) {
           currentLang = settings.lang;
           localStorage.setItem("app_lang", settings.lang);
-          applyI18n();
+          document.documentElement.setAttribute("lang", settings.lang);
+          changed = true;
         }
         if (settings.timeFormat && !localStorage.getItem("app_time_format")) {
           currentTimeFormat = settings.timeFormat;
           localStorage.setItem("app_time_format", settings.timeFormat);
+          changed = true;
+        }
+        if (changed) {
+          applyI18n();
+          loadSettings();
+          if (currentTab === "dashboard") loadDashboard();
+          else if (currentTab === "tasks") loadTasks();
+          else if (currentTab === "schedule") {
+            if (scheduleSubTab === "weekly") loadSchedule();
+            else loadOverrides();
+          }
+          else if (currentTab === "notes") loadNotes();
         }
       }
     } catch (e) {}
@@ -1707,6 +1996,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Apply current preferences
   document.documentElement.setAttribute("data-theme", currentTheme);
   document.documentElement.setAttribute("data-accent", currentAccent);
+  document.documentElement.setAttribute("lang", currentLang);
+  loadSettings();
   applyI18n();
   initSettingsFromServer();
 
