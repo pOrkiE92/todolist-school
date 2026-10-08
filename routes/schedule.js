@@ -10,6 +10,22 @@ const db = require("../db");
 
 const router = express.Router();
 
+const selectTodaySched = db.prepare("SELECT * FROM schedule WHERE day_of_week = ? ORDER BY start_time ASC");
+const selectTodayOvr = db.prepare("SELECT * FROM schedule_override WHERE date = ?");
+const selectAllSched = db.prepare("SELECT * FROM schedule ORDER BY day_of_week ASC, start_time ASC");
+const selectSchedByDay = db.prepare("SELECT * FROM schedule WHERE day_of_week = ? ORDER BY start_time ASC");
+const getSchedById = db.prepare("SELECT * FROM schedule WHERE id = ?");
+const deleteSchedById = db.prepare("DELETE FROM schedule WHERE id = ?");
+const insertSchedStmt = db.prepare(`
+  INSERT INTO schedule (id, day_of_week, start_time, end_time, mapel, ruangan, guru)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
+`);
+const updateSchedStmt = db.prepare(`
+  UPDATE schedule
+  SET day_of_week = ?, start_time = ?, end_time = ?, mapel = ?, ruangan = ?, guru = ?
+  WHERE id = ?
+`);
+
 // ─── Porting effectiveScheduleForDate dari lib/schedule-utils.ts ──────────────
 // Menggabungkan jadwal mingguan + override tanpa mutasi data dasar.
 
@@ -100,21 +116,14 @@ function effectiveScheduleForDate(date, schedules, overrides) {
 router.get("/", (req, res) => {
   try {
     const { day } = req.query;
-    let sql = "SELECT * FROM schedule";
-    const params = [];
-
     if (day !== undefined) {
       const dow = parseInt(day, 10);
       if (isNaN(dow) || dow < 0 || dow > 6) {
         return res.status(400).json({ error: "Parameter day harus antara 0-6" });
       }
-      sql += " WHERE day_of_week = ?";
-      params.push(dow);
+      return res.json(selectSchedByDay.all(dow));
     }
-
-    sql += " ORDER BY day_of_week ASC, start_time ASC";
-    const schedules = db.prepare(sql).all(...params);
-    res.json(schedules);
+    res.json(selectAllSched.all());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -125,8 +134,10 @@ router.get("/", (req, res) => {
 router.get("/today", (req, res) => {
   try {
     const today = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-    const schedules = db.prepare("SELECT * FROM schedule").all();
-    const overrides = db.prepare("SELECT * FROM schedule_override").all();
+    const dow = today.getDay();
+    const key = toDateKey(today);
+    const schedules = selectTodaySched.all(dow);
+    const overrides = selectTodayOvr.all(key);
     const slots = effectiveScheduleForDate(today, schedules, overrides);
     res.json(slots);
   } catch (err) {
@@ -152,12 +163,9 @@ router.post("/", (req, res) => {
     }
 
     const id = randomUUID();
-    db.prepare(`
-      INSERT INTO schedule (id, day_of_week, start_time, end_time, mapel, ruangan, guru)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(id, Number(day_of_week), start_time, end_time, mapel.trim(), ruangan || null, guru || null);
+    insertSchedStmt.run(id, Number(day_of_week), start_time, end_time, mapel.trim(), ruangan || null, guru || null);
 
-    const item = db.prepare("SELECT * FROM schedule WHERE id = ?").get(id);
+    const item = getSchedById.get(id);
     res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -167,7 +175,7 @@ router.post("/", (req, res) => {
 // ─── PUT /api/schedule/:id ────────────────────────────────────────────────────
 router.put("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM schedule WHERE id = ?").get(req.params.id);
+    const existing = getSchedById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Jadwal tidak ditemukan" });
 
     const {
@@ -188,18 +196,14 @@ router.put("/:id", (req, res) => {
       return res.status(400).json({ error: "Validasi gagal", errors });
     }
 
-    db.prepare(`
-      UPDATE schedule
-      SET day_of_week = ?, start_time = ?, end_time = ?, mapel = ?, ruangan = ?, guru = ?
-      WHERE id = ?
-    `).run(
+    updateSchedStmt.run(
       Number(day_of_week), start_time, end_time, String(mapel).trim(),
       ruangan !== undefined ? (ruangan || null) : existing.ruangan,
       guru !== undefined ? (guru || null) : existing.guru,
       req.params.id
     );
 
-    const item = db.prepare("SELECT * FROM schedule WHERE id = ?").get(req.params.id);
+    const item = getSchedById.get(req.params.id);
     res.json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -209,9 +213,9 @@ router.put("/:id", (req, res) => {
 // ─── DELETE /api/schedule/:id ─────────────────────────────────────────────────
 router.delete("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM schedule WHERE id = ?").get(req.params.id);
+    const existing = getSchedById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Jadwal tidak ditemukan" });
-    db.prepare("DELETE FROM schedule WHERE id = ?").run(req.params.id);
+    deleteSchedById.run(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

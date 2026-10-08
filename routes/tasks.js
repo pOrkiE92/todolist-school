@@ -13,6 +13,23 @@ const db = require("../db");
 
 const router = express.Router();
 
+const getTaskById = db.prepare("SELECT * FROM tasks WHERE id = ?");
+const deleteTaskById = db.prepare("DELETE FROM tasks WHERE id = ?");
+const insertTaskStmt = db.prepare(`
+  INSERT INTO tasks (id, mapel, judul, deadline, status, catatan, created_at, updated_at)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`);
+const updateTaskStmt = db.prepare(`
+  UPDATE tasks
+  SET mapel = ?, judul = ?, deadline = ?, status = ?, catatan = ?, updated_at = ?
+  WHERE id = ?
+`);
+const updateTaskStatusStmt = db.prepare(`
+  UPDATE tasks
+  SET status = ?, updated_at = ?
+  WHERE id = ?
+`);
+
 // Helpers
 function nowWIB() {
   // Kembalikan ISO 8601 dengan offset +07:00
@@ -76,12 +93,9 @@ router.post("/", (req, res) => {
     const id = randomUUID();
     const ts = nowWIB();
 
-    db.prepare(`
-      INSERT INTO tasks (id, mapel, judul, deadline, status, catatan, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, mapel || "", judul.trim(), deadline, status, catatan || null, ts, ts);
+    insertTaskStmt.run(id, mapel || "", judul.trim(), deadline, status, catatan || null, ts, ts);
 
-    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+    const task = getTaskById.get(id);
     res.status(201).json(withOverdue(task));
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -91,7 +105,7 @@ router.post("/", (req, res) => {
 // ─── GET /api/tasks/:id ───────────────────────────────────────────────────────
 router.get("/:id", (req, res) => {
   try {
-    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(req.params.id);
+    const task = getTaskById.get(req.params.id);
     if (!task) return res.status(404).json({ error: "Tugas tidak ditemukan" });
     res.json(withOverdue(task));
   } catch (err) {
@@ -102,12 +116,11 @@ router.get("/:id", (req, res) => {
 // ─── PUT /api/tasks/:id ───────────────────────────────────────────────────────
 router.put("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM tasks WHERE id = ?").get(req.params.id);
+    const existing = getTaskById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Tugas tidak ditemukan" });
 
     const { mapel, judul, deadline, status, catatan } = req.body;
 
-    // Validasi
     const errors = {};
     const newJudul = judul !== undefined ? judul : existing.judul;
     const newDeadline = deadline !== undefined ? deadline : existing.deadline;
@@ -122,21 +135,23 @@ router.put("/:id", (req, res) => {
       return res.status(400).json({ error: "Validasi gagal", errors });
     }
 
-    db.prepare(`
-      UPDATE tasks
-      SET mapel = ?, judul = ?, deadline = ?, status = ?, catatan = ?, updated_at = ?
-      WHERE id = ?
-    `).run(
-      mapel !== undefined ? mapel : existing.mapel,
-      newJudul.trim(),
-      newDeadline,
-      newStatus,
-      catatan !== undefined ? (catatan || null) : existing.catatan,
-      nowWIB(),
-      req.params.id
-    );
+    const ts = nowWIB();
+    const isStatusOnly = status !== undefined && mapel === undefined && judul === undefined && deadline === undefined && catatan === undefined;
+    if (isStatusOnly) {
+      updateTaskStatusStmt.run(newStatus, ts, req.params.id);
+    } else {
+      updateTaskStmt.run(
+        mapel !== undefined ? mapel : existing.mapel,
+        newJudul.trim(),
+        newDeadline,
+        newStatus,
+        catatan !== undefined ? (catatan || null) : existing.catatan,
+        ts,
+        req.params.id
+      );
+    }
 
-    const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(req.params.id);
+    const task = getTaskById.get(req.params.id);
     res.json(withOverdue(task));
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -146,10 +161,10 @@ router.put("/:id", (req, res) => {
 // ─── DELETE /api/tasks/:id ────────────────────────────────────────────────────
 router.delete("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM tasks WHERE id = ?").get(req.params.id);
+    const existing = getTaskById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Tugas tidak ditemukan" });
 
-    db.prepare("DELETE FROM tasks WHERE id = ?").run(req.params.id);
+    deleteTaskById.run(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

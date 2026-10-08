@@ -10,6 +10,12 @@ const db = require("../db");
 
 const router = express.Router();
 
+const selectAllNotes = db.prepare("SELECT * FROM quicknotes ORDER BY created_at DESC");
+const getNoteById = db.prepare("SELECT * FROM quicknotes WHERE id = ?");
+const insertNoteStmt = db.prepare("INSERT INTO quicknotes (id, teks, created_at, status) VALUES (?, ?, ?, 'raw')");
+const deleteNoteById = db.prepare("DELETE FROM quicknotes WHERE id = ?");
+const convertNoteById = db.prepare("UPDATE quicknotes SET status = 'converted' WHERE id = ?");
+
 function nowWIB() {
   return new Date().toLocaleString("sv-SE", { timeZone: "Asia/Jakarta" }).replace(" ", "T") + "+07:00";
 }
@@ -17,8 +23,7 @@ function nowWIB() {
 // ─── GET /api/quicknotes ──────────────────────────────────────────────────────
 router.get("/", (req, res) => {
   try {
-    const notes = db.prepare("SELECT * FROM quicknotes ORDER BY created_at DESC").all();
-    res.json(notes);
+    res.json(selectAllNotes.all());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -35,10 +40,9 @@ router.post("/", (req, res) => {
 
     const id = randomUUID();
     const ts = nowWIB();
-    db.prepare("INSERT INTO quicknotes (id, teks, created_at, status) VALUES (?, ?, ?, 'raw')")
-      .run(id, teks.trim(), ts);
+    insertNoteStmt.run(id, teks.trim(), ts);
 
-    const note = db.prepare("SELECT * FROM quicknotes WHERE id = ?").get(id);
+    const note = getNoteById.get(id);
     res.status(201).json(note);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -48,9 +52,9 @@ router.post("/", (req, res) => {
 // ─── DELETE /api/quicknotes/:id ───────────────────────────────────────────────
 router.delete("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM quicknotes WHERE id = ?").get(req.params.id);
+    const existing = getNoteById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Catatan tidak ditemukan" });
-    db.prepare("DELETE FROM quicknotes WHERE id = ?").run(req.params.id);
+    deleteNoteById.run(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -62,11 +66,11 @@ router.delete("/:id", (req, res) => {
 // Pembuat Task dilakukan terpisah via POST /api/tasks.
 router.patch("/:id/convert", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM quicknotes WHERE id = ?").get(req.params.id);
+    const existing = getNoteById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Catatan tidak ditemukan" });
 
-    db.prepare("UPDATE quicknotes SET status = 'converted' WHERE id = ?").run(req.params.id);
-    const note = db.prepare("SELECT * FROM quicknotes WHERE id = ?").get(req.params.id);
+    convertNoteById.run(req.params.id);
+    const note = getNoteById.get(req.params.id);
     res.json(note);
   } catch (err) {
     res.status(500).json({ error: err.message });

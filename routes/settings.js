@@ -9,6 +9,9 @@ const db = require("../db");
 
 const router = express.Router();
 
+const getSettingsStmt = db.prepare("SELECT value FROM _meta WHERE key = 'user_settings'");
+const setSettingsStmt = db.prepare("INSERT OR REPLACE INTO _meta (key, value) VALUES ('user_settings', ?)");
+
 const DEFAULT_SETTINGS = {
   theme: "system",     // "light" | "dark" | "system"
   accent: "navy",      // "navy" | "cream" | "emerald" | "violet" | "amber" | "rose" | "slate"
@@ -19,7 +22,7 @@ const DEFAULT_SETTINGS = {
 // ─── GET /api/settings ────────────────────────────────────────────────────────
 router.get("/", (_req, res) => {
   try {
-    const row = db.prepare("SELECT value FROM _meta WHERE key = 'user_settings'").get();
+    const row = getSettingsStmt.get();
     if (!row || !row.value) {
       return res.json(DEFAULT_SETTINGS);
     }
@@ -35,7 +38,7 @@ router.put("/", (req, res) => {
   try {
     const { theme, accent, lang, timeFormat } = req.body;
 
-    const row = db.prepare("SELECT value FROM _meta WHERE key = 'user_settings'").get();
+    const row = getSettingsStmt.get();
     const existing = row && row.value ? JSON.parse(row.value) : DEFAULT_SETTINGS;
 
     const validThemes = ["light", "dark", "system"];
@@ -50,10 +53,7 @@ router.put("/", (req, res) => {
       timeFormat: validTimeFormats.includes(timeFormat) ? timeFormat : existing.timeFormat,
     };
 
-    db.prepare(`
-      INSERT OR REPLACE INTO _meta (key, value)
-      VALUES ('user_settings', ?)
-    `).run(JSON.stringify(updated));
+    setSettingsStmt.run(JSON.stringify(updated));
 
     res.json(updated);
   } catch (err) {

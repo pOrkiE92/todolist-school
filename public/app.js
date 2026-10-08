@@ -252,6 +252,18 @@ let editingScheduleId = null;
 let editingOverrideId = null;
 let sourceNoteIdForTask = null;
 let confirmCallback = null;
+let activeNavRequestId = 0;
+
+function updateOverdueBadgeElements(overdueList) {
+  const dotDesktop = document.getElementById("overdue-dot-desktop");
+  const badgeMobile = document.getElementById("overdue-badge");
+  const count = overdueList.length;
+  if (dotDesktop) dotDesktop.hidden = count === 0;
+  if (badgeMobile) {
+    badgeMobile.hidden = count === 0;
+    badgeMobile.textContent = count > 0 ? count : "";
+  }
+}
 
 // ──────────── API HELPER ────────────
 async function api(path, options = {}) {
@@ -347,7 +359,7 @@ function dismissToast(el) {
   el.classList.add("toast-out");
   setTimeout(() => {
     if (el.parentNode) el.remove();
-  }, 220);
+  }, 190);
 }
 
 function toast(msg, type = "success") {
@@ -424,6 +436,7 @@ function setScheduleSubTab(sub) {
 
 // ──────────── DASHBOARD MODULE ────────────
 async function loadDashboard() {
+  const reqId = ++activeNavRequestId;
   try {
     const [todaySlots, allTasks, notes] = await Promise.all([
       api("/schedule/today").catch(() => []),
@@ -432,22 +445,6 @@ async function loadDashboard() {
     ]);
 
     const now = new Date();
-
-    // 1. Jadwal Hari Ini
-    const schedContainer = document.getElementById("dashboard-schedule");
-    if (!todaySlots || todaySlots.length === 0) {
-      schedContainer.innerHTML = `
-        <div class="empty-state">
-          <p class="empty-title">Tidak ada jadwal hari ini</p>
-          <p class="empty-sub">Tidak ada mata pelajaran yang terjadwal. Nikmati waktu luangmu!</p>
-        </div>
-      `;
-    } else {
-      schedContainer.innerHTML = todaySlots.map((s) => renderEffectiveSlot(s)).join("");
-    }
-
-    // 2. Tugas Perlu Perhatian (Prioritas: Overdue -> Hari ini -> Besok -> Mendatang)
-    // Non-goals & PRD: Task 'done' tidak dimasukkan ke daftar prioritas!
     const activeTasks = allTasks.filter((t) => t.status !== "done");
 
     const overdueList = [];
@@ -470,40 +467,57 @@ async function loadDashboard() {
       }
     }
 
-    const priorityTasks = [...overdueList, ...todayList, ...tomorrowList, ...upcomingList];
+    // Always update global badges for header and bottom nav
+    updateOverdueBadgeElements(overdueList);
 
-    // Overdue Alert Banner & Badges
+    // If navigated to another tab or superseded by newer request, avoid layout work
+    if (currentTab !== "dashboard" || reqId !== activeNavRequestId) return;
+
+    // 1. Jadwal Hari Ini
+    const schedContainer = document.getElementById("dashboard-schedule");
+    if (schedContainer) {
+      if (!todaySlots || todaySlots.length === 0) {
+        schedContainer.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-title">Tidak ada jadwal hari ini</p>
+            <p class="empty-sub">Tidak ada mata pelajaran yang terjadwal. Nikmati waktu luangmu!</p>
+          </div>
+        `;
+      } else {
+        schedContainer.innerHTML = todaySlots.map((s) => renderEffectiveSlot(s)).join("");
+      }
+    }
+
+    // 2. Tugas Perlu Perhatian
+    const priorityTasks = [...overdueList, ...todayList, ...tomorrowList, ...upcomingList];
     const alertEl = document.getElementById("overdue-alert");
     const alertText = document.getElementById("overdue-alert-text");
-    const dotDesktop = document.getElementById("overdue-dot-desktop");
-    const badgeMobile = document.getElementById("overdue-badge");
 
-    if (overdueList.length > 0) {
-      alertEl.hidden = false;
-      alertEl.style.display = "flex";
-      const titles = overdueList.map((t) => `"${t.judul}"`).join(", ");
-      alertText.textContent = `${overdueList.length} tugas lewat tenggat: ${titles}`;
-      dotDesktop.hidden = false;
-      badgeMobile.hidden = false;
-      badgeMobile.textContent = overdueList.length;
-    } else {
-      alertEl.hidden = true;
-      alertEl.style.display = "none";
-      alertText.textContent = "";
-      dotDesktop.hidden = true;
-      badgeMobile.hidden = true;
+    if (alertEl && alertText) {
+      if (overdueList.length > 0) {
+        alertEl.hidden = false;
+        alertEl.style.display = "flex";
+        const titles = overdueList.map((t) => `"${t.judul}"`).join(", ");
+        alertText.textContent = `${overdueList.length} tugas lewat tenggat: ${titles}`;
+      } else {
+        alertEl.hidden = true;
+        alertEl.style.display = "none";
+        alertText.textContent = "";
+      }
     }
 
     const tasksContainer = document.getElementById("dashboard-tasks");
-    if (priorityTasks.length === 0) {
-      tasksContainer.innerHTML = `
-        <div class="empty-state">
-          <p class="empty-title">Semua tugas beres!</p>
-          <p class="empty-sub">Tidak ada tugas mendesak atau yang belum selesai saat ini.</p>
-        </div>
-      `;
-    } else {
-      tasksContainer.innerHTML = priorityTasks.slice(0, 4).map((t) => renderTaskCard(t)).join("");
+    if (tasksContainer) {
+      if (priorityTasks.length === 0) {
+        tasksContainer.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-title">Semua tugas beres!</p>
+            <p class="empty-sub">Tidak ada tugas mendesak atau yang belum selesai saat ini.</p>
+          </div>
+        `;
+      } else {
+        tasksContainer.innerHTML = priorityTasks.slice(0, 4).map((t) => renderTaskCard(t)).join("");
+      }
     }
 
     // 3. Counter link notes
@@ -558,6 +572,7 @@ function renderEffectiveSlot(slot) {
 
 // ──────────── TASKS MODULE ────────────
 async function loadTasks() {
+  const reqId = ++activeNavRequestId;
   const status = document.getElementById("filter-status").value;
   const mapel = document.getElementById("filter-mapel").value;
   const sort = document.getElementById("filter-sort").value;
@@ -569,6 +584,10 @@ async function loadTasks() {
   const container = document.getElementById("tasks-list");
   try {
     const tasks = await api(`/tasks${query}`);
+    if (tasks && Array.isArray(tasks)) {
+      updateOverdueBadgeElements(tasks.filter((t) => t.status !== "done" && t.is_overdue));
+    }
+    if (currentTab !== "tasks" || reqId !== activeNavRequestId) return;
     if (!tasks || tasks.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -581,7 +600,9 @@ async function loadTasks() {
     }
     container.innerHTML = tasks.map((t) => renderTaskCard(t)).join("");
   } catch (err) {
-    container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat tugas</p><p class="empty-sub">${err.message}</p></div>`;
+    if (currentTab === "tasks") {
+      container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat tugas</p><p class="empty-sub">${err.message}</p></div>`;
+    }
   }
 }
 
@@ -618,15 +639,35 @@ function renderTaskCard(task) {
 }
 
 async function changeTaskStatus(id, newStatus) {
+  const cards = document.querySelectorAll(`[data-task-id="${id}"]`);
+  const prevStates = [];
+  cards.forEach((card) => {
+    prevStates.push(card.classList.contains("done"));
+    card.classList.toggle("done", newStatus === "done");
+    const sel = card.querySelector(".badge-status");
+    if (sel) {
+      sel.className = `select-sm badge-status ${newStatus}`;
+      sel.value = newStatus;
+    }
+  });
+
   try {
     await api(`/tasks/${id}`, {
       method: "PUT",
       body: { status: newStatus },
     });
     toast(`Status diubah: ${STATUS_LABEL[newStatus]}`);
-    loadDashboard();
-    if (currentTab === "tasks") loadTasks();
+
+    const filterStatusEl = document.getElementById("filter-status");
+    if (currentTab === "tasks" && filterStatusEl && filterStatusEl.value !== "all") {
+      loadTasks();
+    } else if (currentTab === "dashboard") {
+      loadDashboard();
+    }
   } catch (err) {
+    cards.forEach((card, idx) => {
+      card.classList.toggle("done", prevStates[idx]);
+    });
     toast(`Gagal mengubah status: ${err.message}`, "error");
   }
 }
@@ -635,10 +676,17 @@ async function changeTaskStatus(id, newStatus) {
 function renderDayPills() {
   const container = document.getElementById("day-pills");
   if (!container) return;
-  // Urutan Senin (1) s/d Minggu (0)
   const ordered = [1, 2, 3, 4, 5, 6, 0];
-  const todayDow = new Date().getDay();
 
+  if (container.children.length > 0) {
+    const buttons = container.querySelectorAll(".day-pill");
+    buttons.forEach((btn, idx) => {
+      btn.classList.toggle("active", ordered[idx] === selectedDay);
+    });
+    return;
+  }
+
+  const todayDow = new Date().getDay();
   container.innerHTML = ordered.map((d) => {
     const isSelected = selectedDay === d;
     const isToday = todayDow === d;
@@ -658,10 +706,12 @@ function selectDay(dow) {
 }
 
 async function loadSchedule() {
+  const reqId = ++activeNavRequestId;
   renderDayPills();
   const container = document.getElementById("schedule-list");
   try {
     const list = await api(`/schedule?day=${selectedDay}`);
+    if (currentTab !== "schedule" || scheduleSubTab !== "weekly" || reqId !== activeNavRequestId) return;
     if (!list || list.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -693,17 +743,22 @@ async function loadSchedule() {
       </div>
     `).join("");
   } catch (err) {
-    container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat jadwal</p><p class="empty-sub">${err.message}</p></div>`;
+    if (currentTab === "schedule") {
+      container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat jadwal</p><p class="empty-sub">${err.message}</p></div>`;
+    }
   }
 }
 
 // ──────────── OVERRIDES MODULE ────────────
 async function loadOverrides() {
+  const reqId = ++activeNavRequestId;
   const container = document.getElementById("overrides-list");
   try {
     const list = await api("/schedule/overrides");
     const badgeCount = document.getElementById("override-count-badge");
     if (badgeCount) badgeCount.textContent = `(${list.length})`;
+
+    if (currentTab !== "schedule" || scheduleSubTab !== "overrides" || reqId !== activeNavRequestId) return;
 
     if (!list || list.length === 0) {
       container.innerHTML = `
@@ -747,15 +802,19 @@ async function loadOverrides() {
       `;
     }).join("");
   } catch (err) {
-    container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat pengecualian</p><p class="empty-sub">${err.message}</p></div>`;
+    if (currentTab === "schedule") {
+      container.innerHTML = `<div class="empty-state"><p class="empty-title">Gagal memuat pengecualian</p><p class="empty-sub">${err.message}</p></div>`;
+    }
   }
 }
 
 // ──────────── QUICK NOTES MODULE ────────────
 async function loadNotes() {
+  const reqId = ++activeNavRequestId;
   const container = document.getElementById("notes-list");
   try {
     const list = await api("/quicknotes");
+    if (currentTab !== "notes" || reqId !== activeNavRequestId) return;
     if (!list || list.length === 0) {
       container.innerHTML = `
         <div class="empty-state">

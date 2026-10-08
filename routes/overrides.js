@@ -10,20 +10,28 @@ const db = require("../db");
 
 const router = express.Router();
 
+const selectAllOvr = db.prepare("SELECT * FROM schedule_override ORDER BY date ASC, start_time ASC");
+const selectOvrByDate = db.prepare("SELECT * FROM schedule_override WHERE date = ? ORDER BY date ASC, start_time ASC");
+const getOvrById = db.prepare("SELECT * FROM schedule_override WHERE id = ?");
+const deleteOvrById = db.prepare("DELETE FROM schedule_override WHERE id = ?");
+const insertOvrStmt = db.prepare(`
+  INSERT INTO schedule_override (id, date, type, mapel, start_time, end_time, ruangan, guru, keterangan)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`);
+const updateOvrStmt = db.prepare(`
+  UPDATE schedule_override
+  SET date = ?, type = ?, mapel = ?, start_time = ?, end_time = ?, ruangan = ?, guru = ?, keterangan = ?
+  WHERE id = ?
+`);
+
 // ─── GET /api/schedule/overrides ─────────────────────────────────────────────
 router.get("/", (req, res) => {
   try {
     const { date } = req.query;
-    let sql = "SELECT * FROM schedule_override";
-    const params = [];
-
     if (date) {
-      sql += " WHERE date = ?";
-      params.push(date);
+      return res.json(selectOvrByDate.all(date));
     }
-
-    sql += " ORDER BY date ASC, start_time ASC";
-    res.json(db.prepare(sql).all(...params));
+    res.json(selectAllOvr.all());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -46,10 +54,7 @@ router.post("/", (req, res) => {
     }
 
     const id = randomUUID();
-    db.prepare(`
-      INSERT INTO schedule_override (id, date, type, mapel, start_time, end_time, ruangan, guru, keterangan)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
+    insertOvrStmt.run(
       id, date, type,
       type !== "cancel" ? mapel : null,
       start_time || null,
@@ -59,7 +64,7 @@ router.post("/", (req, res) => {
       keterangan || null
     );
 
-    const item = db.prepare("SELECT * FROM schedule_override WHERE id = ?").get(id);
+    const item = getOvrById.get(id);
     res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -69,7 +74,7 @@ router.post("/", (req, res) => {
 // ─── PUT /api/schedule/overrides/:id ─────────────────────────────────────────
 router.put("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM schedule_override WHERE id = ?").get(req.params.id);
+    const existing = getOvrById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Pengecualian tidak ditemukan" });
 
     const {
@@ -93,11 +98,7 @@ router.put("/:id", (req, res) => {
       return res.status(400).json({ error: "Validasi gagal", errors });
     }
 
-    db.prepare(`
-      UPDATE schedule_override
-      SET date = ?, type = ?, mapel = ?, start_time = ?, end_time = ?, ruangan = ?, guru = ?, keterangan = ?
-      WHERE id = ?
-    `).run(
+    updateOvrStmt.run(
       date, type,
       type !== "cancel" ? (resolvedMapel || null) : null,
       start_time !== undefined ? (start_time || null) : existing.start_time,
@@ -108,7 +109,7 @@ router.put("/:id", (req, res) => {
       req.params.id
     );
 
-    const item = db.prepare("SELECT * FROM schedule_override WHERE id = ?").get(req.params.id);
+    const item = getOvrById.get(req.params.id);
     res.json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -118,9 +119,9 @@ router.put("/:id", (req, res) => {
 // ─── DELETE /api/schedule/overrides/:id ──────────────────────────────────────
 router.delete("/:id", (req, res) => {
   try {
-    const existing = db.prepare("SELECT * FROM schedule_override WHERE id = ?").get(req.params.id);
+    const existing = getOvrById.get(req.params.id);
     if (!existing) return res.status(404).json({ error: "Pengecualian tidak ditemukan" });
-    db.prepare("DELETE FROM schedule_override WHERE id = ?").run(req.params.id);
+    deleteOvrById.run(req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

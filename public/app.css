@@ -1396,13 +1396,11 @@ input, select, textarea, button {
   backface-visibility: hidden;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  will-change: transform, opacity, max-height;
-  animation: toastPopIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  animation: toastPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transition:
-    opacity 0.2s ease,
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    max-height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    margin-bottom 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.18s ease,
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   user-select: none;
 }
@@ -1414,8 +1412,6 @@ input, select, textarea, button {
 .toast.toast-out {
   opacity: 0;
   transform: translate3d(0, -10px, 0) scale(0.94);
-  max-height: 0;
-  margin-bottom: -8px;
   pointer-events: none;
 }
 
@@ -1695,4 +1691,12 @@ input, select, textarea, button {
 .settings-about-val {
   font-weight: 600;
   color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

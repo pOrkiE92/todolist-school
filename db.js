@@ -20,6 +20,8 @@ const db = new DatabaseSync(DB_PATH);
 // Aktifkan journal_mode DELETE dan synchronous NORMAL (aman untuk Termux/PRoot)
 db.exec("PRAGMA journal_mode = DELETE;");
 db.exec("PRAGMA synchronous = NORMAL;");
+db.exec("PRAGMA temp_store = MEMORY;");
+db.exec("PRAGMA cache_size = -2000;");
 db.exec("PRAGMA foreign_keys = ON;");
 
 // ─────────────────────────────────────────────
@@ -73,6 +75,13 @@ db.exec(`
     key   TEXT PRIMARY KEY,
     value TEXT
   );
+
+  CREATE INDEX IF NOT EXISTS idx_tasks_deadline ON tasks(deadline);
+  CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+  CREATE INDEX IF NOT EXISTS idx_tasks_mapel ON tasks(mapel);
+  CREATE INDEX IF NOT EXISTS idx_schedule_day ON schedule(day_of_week, start_time);
+  CREATE INDEX IF NOT EXISTS idx_override_date ON schedule_override(date);
+  CREATE INDEX IF NOT EXISTS idx_quicknotes_created ON quicknotes(created_at);
 `);
 
 // ─────────────────────────────────────────────

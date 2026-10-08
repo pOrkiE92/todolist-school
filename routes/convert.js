@@ -10,6 +10,7 @@
 "use strict";
 
 const express = require("express");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const router = express.Router();
 
 function normalizeDeadlineToISO(raw) {
@@ -56,11 +57,8 @@ router.post("/", async (req, res) => {
       day: "numeric"
     });
 
-    const { GoogleGenerativeAI } = require("@google/generative-ai");
     const genAI = new GoogleGenerativeAI(apiKey);
-
-    // Gunakan model aktif (gemini-3.6-flash atau gemini-flash-latest)
-    const modelName = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+    const modelName = process.env.GEMINI_MODEL || "gemini-1.5-flash";
     const model = genAI.getGenerativeModel({
       model: modelName,
       generationConfig: {
