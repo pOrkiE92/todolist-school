@@ -5,6 +5,7 @@
 "use strict";
 
 const express = require("express");
+const crypto = require("crypto");
 const db = require("../db");
 
 const router = express.Router();
@@ -76,6 +77,7 @@ router.post("/import", (req, res) => {
     const schedules = Array.isArray(data.schedules) ? data.schedules : [];
     const overrides = Array.isArray(data.overrides) ? data.overrides : [];
     const notes = Array.isArray(data.notes) ? data.notes : [];
+    const subjects = Array.isArray(data.subjects) ? data.subjects : [];
 
     db.exec("BEGIN TRANSACTION;");
     try {
@@ -84,6 +86,9 @@ router.post("/import", (req, res) => {
         db.exec("DELETE FROM schedule;");
         db.exec("DELETE FROM schedule_override;");
         db.exec("DELETE FROM quicknotes;");
+        if (subjects.length > 0) {
+          db.exec("DELETE FROM subjects;");
+        }
       }
 
       const insertTask = db.prepare(`
@@ -154,6 +159,19 @@ router.post("/import", (req, res) => {
         );
       }
 
+      const insertSubject = db.prepare(`
+        INSERT OR REPLACE INTO subjects (id, name, created_at)
+        VALUES (?, ?, ?)
+      `);
+      for (const s of subjects) {
+        if (!s.name) continue;
+        insertSubject.run(
+          s.id || "subj_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16),
+          s.name,
+          s.created_at || new Date().toISOString()
+        );
+      }
+
       db.exec("COMMIT;");
 
       res.json({
@@ -164,6 +182,7 @@ router.post("/import", (req, res) => {
           schedules: schedules.length,
           overrides: overrides.length,
           notes: notes.length,
+          subjects: subjects.length,
         },
       });
     } catch (txErr) {

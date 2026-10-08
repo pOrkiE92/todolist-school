@@ -76,13 +76,45 @@ db.exec(`
     value TEXT
   );
 
+  CREATE TABLE IF NOT EXISTS subjects (
+    id         TEXT PRIMARY KEY,
+    name       TEXT UNIQUE NOT NULL,
+    created_at TEXT NOT NULL
+  );
+
   CREATE INDEX IF NOT EXISTS idx_tasks_deadline ON tasks(deadline);
   CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
   CREATE INDEX IF NOT EXISTS idx_tasks_mapel ON tasks(mapel);
   CREATE INDEX IF NOT EXISTS idx_schedule_day ON schedule(day_of_week, start_time);
   CREATE INDEX IF NOT EXISTS idx_override_date ON schedule_override(date);
   CREATE INDEX IF NOT EXISTS idx_quicknotes_created ON quicknotes(created_at);
+  CREATE INDEX IF NOT EXISTS idx_subjects_name ON subjects(name);
 `);
+
+const DEFAULT_MAPEL = [
+  "Matematika",
+  "Bahasa Indonesia",
+  "Bahasa Inggris",
+  "IPA",
+  "IPS",
+  "Informatika",
+  "Seni Budaya",
+  "PJOK",
+  "PPKn",
+  "Agama",
+  "Umum",
+];
+
+const crypto = require("crypto");
+const insertSubj = db.prepare("INSERT OR IGNORE INTO subjects (id, name, created_at) VALUES (?, ?, ?)");
+const now = new Date().toISOString();
+for (const name of DEFAULT_MAPEL) {
+  const existing = db.prepare("SELECT id FROM subjects WHERE name = ?").get(name);
+  if (!existing) {
+    const id = "subj_" + crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+    insertSubj.run(id, name, now);
+  }
+}
 
 // ─────────────────────────────────────────────
 // SEED INITIAL DATA (HANYA SEKALI SAAT DATABASE BARU)

@@ -33,6 +33,7 @@ const overridesRouter = require("./routes/overrides");
 const quicknotesRouter = require("./routes/quicknotes");
 const convertRouter = require("./routes/convert");
 const settingsRouter = require("./routes/settings");
+const subjectsRouter = require("./routes/subjects");
 
 app.use("/api/tasks", tasksRouter);
 app.use("/api/schedule/overrides", overridesRouter);   // harus sebelum /api/schedule agar :id tidak konflik
@@ -40,6 +41,7 @@ app.use("/api/schedule", scheduleRouter);
 app.use("/api/quicknotes", quicknotesRouter);
 app.use("/api/convert", convertRouter);
 app.use("/api/settings", settingsRouter);
+app.use("/api/subjects", subjectsRouter);
 
 // ─── Catch-all — serve index.html untuk SPA ──────────────────────────────────
 app.get("*", (req, res) => {

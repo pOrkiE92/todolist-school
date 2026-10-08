@@ -375,6 +375,20 @@
               <input type="file" id="import-file-input" accept=".json,application/json" style="display: none;" onchange="handleImportFile(event)" />
             </label>
           </div>
+        <!-- Card: Mata Pelajaran -->
+        <div class="settings-card">
+          <div class="settings-card-header">
+            <span class="settings-card-icon">📚</span>
+            <div>
+              <h3 class="settings-card-title" data-i18n="settings_subjects_title">Mata Pelajaran</h3>
+              <p class="settings-card-desc" data-i18n="settings_subjects_desc">Atur dan kelola daftar mata pelajaran sekolah</p>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openSubjectModal()">
+              <span>⚙️</span> <span data-i18n="btn_manage_subjects_action">Kelola Daftar Mapel</span>
+            </button>
+          </div>
         </div>
 
         <!-- Card 4: Tentang Aplikasi -->
@@ -449,8 +463,14 @@
       <div class="modal-desc" id="task-modal-desc" hidden></div>
       <form id="task-form" class="form" novalidate>
         <div class="form-group">
-          <label class="form-label" for="tf-mapel" data-i18n="lbl_subject">Mapel</label>
-          <select id="tf-mapel" class="form-select"></select>
+          <div class="form-label-row">
+            <label class="form-label" for="tf-mapel" data-i18n="lbl_subject" style="margin-bottom:0;">Mapel</label>
+            <button type="button" class="link-btn" onclick="openSubjectModal('tf-mapel')" data-i18n="btn_manage_subjects" style="font-size:12px; font-weight:600;">+ Kelola Mapel</button>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <select id="tf-mapel" class="form-select" style="flex:1;"></select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openSubjectModal('tf-mapel')" title="Tambah / Kelola Mapel" style="padding:0 12px; font-weight:700; font-size:15px; flex-shrink:0;">+</button>
+          </div>
           <span class="form-error" id="tf-mapel-error"></span>
         </div>
         <div class="form-group">
@@ -516,8 +536,14 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" for="sf-mapel" data-i18n="lbl_subject">Mapel *</label>
-          <select id="sf-mapel" class="form-select"></select>
+          <div class="form-label-row">
+            <label class="form-label" for="sf-mapel" data-i18n="lbl_subject" style="margin-bottom:0;">Mapel *</label>
+            <button type="button" class="link-btn" onclick="openSubjectModal('sf-mapel')" data-i18n="btn_manage_subjects" style="font-size:12px; font-weight:600;">+ Kelola Mapel</button>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <select id="sf-mapel" class="form-select" style="flex:1;"></select>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openSubjectModal('sf-mapel')" title="Tambah / Kelola Mapel" style="padding:0 12px; font-weight:700; font-size:15px; flex-shrink:0;">+</button>
+          </div>
           <span class="form-error" id="sf-mapel-error"></span>
         </div>
         <div class="form-row">
@@ -562,8 +588,14 @@
         </div>
         <div id="of-details">
           <div class="form-group">
-            <label class="form-label" for="of-mapel" data-i18n="lbl_subject">Mapel *</label>
-            <select id="of-mapel" class="form-select"></select>
+            <div class="form-label-row">
+              <label class="form-label" for="of-mapel" data-i18n="lbl_subject" style="margin-bottom:0;">Mapel *</label>
+              <button type="button" class="link-btn" onclick="openSubjectModal('of-mapel')" data-i18n="btn_manage_subjects" style="font-size:12px; font-weight:600;">+ Kelola Mapel</button>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <select id="of-mapel" class="form-select" style="flex:1;"></select>
+              <button type="button" class="btn btn-outline btn-sm" onclick="openSubjectModal('of-mapel')" title="Tambah / Kelola Mapel" style="padding:0 12px; font-weight:700; font-size:15px; flex-shrink:0;">+</button>
+            </div>
             <span class="form-error" id="of-mapel-error"></span>
           </div>
           <div class="form-row">
@@ -631,6 +663,25 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-outline" onclick="closeImportModal()" data-i18n="btn_cancel">Batal</button>
         <button type="button" class="btn btn-primary" id="import-submit-btn" onclick="executeImport()" data-i18n="btn_import_now">Impor Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subject Management Modal -->
+  <div class="modal-backdrop" id="subject-modal-backdrop" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="subject-modal-title">
+      <div class="modal-header">
+        <h3 class="modal-title" id="subject-modal-title" data-i18n="modal_subjects_title">Kelola Mata Pelajaran</h3>
+        <button class="modal-close" onclick="closeSubjectModal()">✕</button>
+      </div>
+      <p class="confirm-desc" data-i18n="modal_subjects_desc" style="margin-bottom: 12px;">Tambah mata pelajaran baru atau hapus yang tidak diperlukan.</p>
+      <form id="add-subject-form" onsubmit="handleCreateSubject(event)" style="display:flex; gap:6px; margin-bottom:12px;">
+        <input type="text" id="new-subject-input" class="form-input" placeholder="Nama mapel baru..." autocomplete="off" style="flex:1;" />
+        <button type="submit" class="btn btn-primary btn-sm" id="btn-add-subject-submit" data-i18n="btn_add_subject">+ Tambah</button>
+      </form>
+      <div id="subject-list-container" class="subject-chips-list"></div>
+      <div class="modal-footer" style="margin-top: 14px;">
+        <button type="button" class="btn btn-primary btn-sm" onclick="closeSubjectModal()" data-i18n="btn_done">Selesai</button>
       </div>
     </div>
   </div>

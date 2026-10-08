@@ -1229,8 +1229,12 @@ input, select, textarea, button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
 }
+
+#confirm-modal-backdrop {
+  z-index: 60;
+}
+
 
 .modal {
   background-color: var(--card);
@@ -1691,6 +1695,57 @@ input, select, textarea, button {
 .settings-about-val {
   font-weight: 600;
   color: var(--text);
+}
+
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.subject-chips-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px;
+}
+
+.subject-chip-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-hover, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 6px);
+  transition: background 0.15s ease;
+}
+
+.subject-chip-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--card-foreground);
+}
+
+.subject-delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: var(--destructive, #dc2626);
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s;
+  line-height: 1;
+  font-size: 14px;
+}
+
+.subject-delete-btn:hover {
+  opacity: 1;
+  background: var(--destructive-light, rgba(239, 68, 68, 0.1));
 }
 
 @media (prefers-reduced-motion: reduce) {

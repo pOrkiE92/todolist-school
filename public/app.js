@@ -3,14 +3,38 @@
 
 "use strict";
 
-const MAPEL_LIST = [
+let subjects = [];
+let activeTargetSubjectSelect = null;
+const DEFAULT_MAPEL_FALLBACK = [
   "Matematika",
   "Bahasa Indonesia",
   "Bahasa Inggris",
   "IPA",
   "IPS",
   "Informatika",
+  "Seni Budaya",
+  "PJOK",
+  "PPKn",
+  "Agama",
+  "Umum",
 ];
+
+function getSubjectNames() {
+  if (subjects.length > 0) {
+    return subjects.map((s) => s.name);
+  }
+  return DEFAULT_MAPEL_FALLBACK;
+}
+
+const MAPEL_LIST = new Proxy([], {
+  get(_target, prop) {
+    const list = getSubjectNames();
+    if (typeof list[prop] === "function") {
+      return list[prop].bind(list);
+    }
+    return list[prop];
+  }
+});
 
 // ──────────── I18N DICTIONARY ────────────
 const I18N = {
@@ -213,6 +237,24 @@ const I18N = {
     toast_settings_saved: "Pengaturan berhasil disimpan",
     toast_data_exported: "Data berhasil diekspor",
     toast_data_imported: "Data cadangan berhasil dipulihkan",
+    lbl_manage_subjects: "Kelola Mapel",
+    btn_manage_subjects: "+ Kelola Mapel",
+    modal_subjects_title: "Kelola Mata Pelajaran",
+    modal_subjects_desc: "Tambah mata pelajaran baru atau hapus yang tidak diperlukan.",
+    placeholder_new_subject: "Nama mapel baru...",
+    btn_add_subject: "+ Tambah",
+    btn_done: "Selesai",
+    settings_subjects_title: "Mata Pelajaran",
+    settings_subjects_desc: "Atur dan kelola daftar mata pelajaran sekolah",
+    btn_manage_subjects_action: "Kelola Daftar Mapel",
+    toast_subject_added: "Mata pelajaran berhasil ditambahkan",
+    toast_subject_deleted: "Mata pelajaran berhasil dihapus",
+    confirm_delete_subject_title: "Hapus Mata Pelajaran?",
+    confirm_delete_subject_desc: 'Mata pelajaran "{name}" akan dihapus dari daftar pilihan.',
+    err_subject_empty: "Nama mata pelajaran tidak boleh kosong",
+    err_load_subjects: "Gagal memuat mata pelajaran",
+    err_save_subject: "Gagal menyimpan mata pelajaran",
+    err_delete_subject: "Gagal menghapus mata pelajaran",
   },
   en: {
     nav_dashboard: "Dashboard",
@@ -413,6 +455,24 @@ const I18N = {
     toast_settings_saved: "Settings saved successfully",
     toast_data_exported: "Data exported successfully",
     toast_data_imported: "Backup data restored successfully",
+    lbl_manage_subjects: "Manage Subjects",
+    btn_manage_subjects: "+ Manage Subjects",
+    modal_subjects_title: "Manage Subjects",
+    modal_subjects_desc: "Add new subjects or delete subjects you do not need.",
+    placeholder_new_subject: "New subject name...",
+    btn_add_subject: "+ Add",
+    btn_done: "Done",
+    settings_subjects_title: "School Subjects",
+    settings_subjects_desc: "Configure and manage school subjects list",
+    btn_manage_subjects_action: "Manage Subjects List",
+    toast_subject_added: "Subject added successfully",
+    toast_subject_deleted: "Subject deleted successfully",
+    confirm_delete_subject_title: "Delete Subject?",
+    confirm_delete_subject_desc: 'Subject "{name}" will be removed from selection.',
+    err_subject_empty: "Subject name cannot be empty",
+    err_load_subjects: "Failed to load subjects",
+    err_save_subject: "Failed to save subject",
+    err_delete_subject: "Failed to delete subject",
   }
 };
 
@@ -1179,7 +1239,7 @@ function openTaskModal(config = {}) {
   document.getElementById("task-form-submit").textContent = config.submitLabel || (editingTaskId ? t("btn_update_form") : t("btn_save_form"));
 
   const initial = config.initial || {};
-  document.getElementById("tf-mapel").value = initial.mapel || MAPEL_LIST[0];
+  populateMapel("tf-mapel", false, initial.mapel || MAPEL_LIST[0]);
   document.getElementById("tf-judul").value = initial.judul || "";
   document.getElementById("tf-deadline").value = toInputValue(initial.deadline);
   document.getElementById("tf-status").value = initial.status || "todo";
@@ -1224,7 +1284,7 @@ function openScheduleModal(initial = null) {
   document.getElementById("sf-day").value = String(initial?.day_of_week ?? selectedDay);
   document.getElementById("sf-start").value = initial?.start_time || "07:00";
   document.getElementById("sf-end").value = initial?.end_time || "08:30";
-  document.getElementById("sf-mapel").value = initial?.mapel || MAPEL_LIST[0];
+  populateMapel("sf-mapel", false, initial?.mapel || MAPEL_LIST[0]);
   document.getElementById("sf-ruangan").value = initial?.ruangan || "";
   document.getElementById("sf-guru").value = initial?.guru || "";
 
@@ -1257,7 +1317,7 @@ function openOverrideModal(initial = null) {
   const type = initial?.type || "replace";
   document.getElementById("of-type").value = type;
   document.getElementById("of-date").value = initial?.date || new Date().toISOString().slice(0, 10);
-  document.getElementById("of-mapel").value = initial?.mapel || MAPEL_LIST[0];
+  populateMapel("of-mapel", false, initial?.mapel || MAPEL_LIST[0]);
   document.getElementById("of-start").value = initial?.start_time || "";
   document.getElementById("of-end").value = initial?.end_time || "";
   document.getElementById("of-ruangan").value = initial?.ruangan || "";
@@ -1421,26 +1481,162 @@ function escapeAttr(str) {
   return String(str).replace(/'/g, "\\'").replace(/"/g, "&quot;");
 }
 
-// ──────────── INIT & EVENT LISTENERS ────────────
+
+function populateMapel(selectId, includeAll = false, selectedVal = null) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  const curVal = selectedVal !== null && selectedVal !== undefined ? selectedVal : sel.value;
+  const names = getSubjectNames();
+
+  let html = includeAll ? `<option value="all">${t("filter_all_mapel")}</option>` : "";
+  html += names.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
+  sel.innerHTML = html;
+
+  if (curVal !== undefined && curVal !== null && curVal !== "") {
+    sel.value = curVal;
+  }
+}
+
+function populateAllMapel() {
+  populateMapel("filter-mapel", true);
+  populateMapel("tf-mapel", false);
+  populateMapel("sf-mapel", false);
+  populateMapel("of-mapel", false);
+}
+
+async function loadSubjects() {
+  try {
+    const list = await api("/subjects");
+    if (Array.isArray(list) && list.length > 0) {
+      subjects = list;
+    }
+  } catch (err) {
+    console.error("Failed to load subjects:", err);
+  }
+  populateAllMapel();
+  const backdrop = document.getElementById("subject-modal-backdrop");
+  if (backdrop && !backdrop.hidden) {
+    renderSubjectList();
+  }
+}
+
+function renderSubjectList() {
+  const container = document.getElementById("subject-list-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const list = subjects.length > 0 ? subjects : DEFAULT_MAPEL_FALLBACK.map((name, idx) => ({ id: `default-${idx}`, name }));
+
+  list.forEach((s) => {
+    const item = document.createElement("div");
+    item.className = "subject-chip-item";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "subject-chip-name";
+    nameSpan.textContent = s.name;
+    item.appendChild(nameSpan);
+
+    const delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "subject-delete-btn";
+    delBtn.setAttribute("aria-label", `${t("btn_delete")} ${s.name}`);
+    delBtn.textContent = "✕";
+    delBtn.addEventListener("click", () => confirmDeleteSubject(s.id, s.name));
+    item.appendChild(delBtn);
+
+    container.appendChild(item);
+  });
+}
+
+function openSubjectModal(targetSelectId = null) {
+  activeTargetSubjectSelect = targetSelectId || null;
+  const backdrop = document.getElementById("subject-modal-backdrop");
+  if (backdrop) {
+    backdrop.hidden = false;
+    backdrop.style.display = "flex";
+  }
+  const input = document.getElementById("new-subject-input");
+  if (input) {
+    input.value = "";
+    setTimeout(() => input.focus(), 50);
+  }
+  renderSubjectList();
+}
+
+function closeSubjectModal() {
+  const backdrop = document.getElementById("subject-modal-backdrop");
+  if (backdrop) {
+    backdrop.hidden = true;
+    backdrop.style.display = "none";
+  }
+  activeTargetSubjectSelect = null;
+}
+
+async function handleCreateSubject(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const input = document.getElementById("new-subject-input");
+  const name = input ? input.value.trim() : "";
+  if (!name) {
+    toast(t("err_subject_empty"), "error");
+    return;
+  }
+
+  const submitBtn = document.getElementById("btn-add-subject-submit");
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    const created = await api("/subjects", {
+      method: "POST",
+      body: { name },
+    });
+    toast(t("toast_subject_added"));
+    if (input) {
+      input.value = "";
+      input.focus();
+    }
+    await loadSubjects();
+
+    if (activeTargetSubjectSelect) {
+      const targetSelect = document.getElementById(activeTargetSubjectSelect);
+      if (targetSelect && created && created.name) {
+        targetSelect.value = created.name;
+      }
+    }
+  } catch (err) {
+    toast(err.message || t("err_save_subject"), "error");
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+function confirmDeleteSubject(id, name) {
+  if (subjects.length <= 1) {
+    toast(currentLang === "en" ? "At least one subject is required" : "Minimal harus ada 1 mata pelajaran", "error");
+    return;
+  }
+
+  openConfirmModal(
+    t("confirm_delete_subject_title"),
+    t("confirm_delete_subject_desc").replace("{name}", name),
+    async () => {
+      try {
+        await api(`/subjects/${id}`, { method: "DELETE" });
+        toast(t("toast_subject_deleted"));
+        await loadSubjects();
+      } catch (err) {
+        toast(`${t("err_delete_subject")}: ${err.message}`, "error");
+      }
+    }
+  );
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Header date
   const dateEl = document.getElementById("header-date");
   if (dateEl) dateEl.textContent = formatFullDate();
 
-  // Populate Mapel dropdowns
-  const populateMapel = (selectId, includeAll = false) => {
-    const sel = document.getElementById(selectId);
-    if (!sel) return;
-    const curVal = sel.value;
-    sel.innerHTML = (includeAll ? `<option value="all">${t("filter_all_mapel")}</option>` : "") +
-      MAPEL_LIST.map((m) => `<option value="${m}">${m}</option>`).join("");
-    if (curVal) sel.value = curVal;
-  };
+  populateAllMapel();
+  loadSubjects();
 
-  populateMapel("filter-mapel", true);
-  populateMapel("tf-mapel");
-  populateMapel("sf-mapel");
-  populateMapel("of-mapel");
 
   // Navigation tab clicks
   document.querySelectorAll("[data-tab]").forEach((btn) => {
@@ -1714,12 +1910,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sfGuru) sfGuru.placeholder = t("placeholder_teacher");
     const ofKet = document.getElementById("of-ket");
     if (ofKet) ofKet.placeholder = t("placeholder_override_notes");
+    const newSubInput = document.getElementById("new-subject-input");
+    if (newSubInput) newSubInput.placeholder = t("placeholder_new_subject");
 
     // Update header date
     const headerDateEl = document.getElementById("header-date");
     if (headerDateEl) headerDateEl.textContent = formatFullDate(new Date());
 
-    populateMapel("filter-mapel", true);
+    populateAllMapel();
     updateDayOptions();
   }
 
@@ -1811,18 +2009,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function exportAppData() {
     try {
-      const [tasks, schedules, overrides, notes] = await Promise.all([
+      const [tasks, schedules, overrides, notes, subjectsData] = await Promise.all([
         api("/tasks"),
         api("/schedule"),
         api("/schedule/overrides"),
         api("/quicknotes"),
+        api("/subjects").catch(() => []),
       ]);
 
       const backup = {
         app: "Todolist Sekolah",
         version: "1.1.0",
         exported_at: new Date().toISOString(),
-        data: { tasks, schedules, overrides, notes }
+        data: { tasks, schedules, overrides, notes, subjects: subjectsData }
       };
 
       const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -1860,8 +2059,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const schedCount = Array.isArray(data.schedules) ? data.schedules.length : 0;
         const ovrCount = Array.isArray(data.overrides) ? data.overrides.length : 0;
         const notesCount = Array.isArray(data.notes) ? data.notes.length : 0;
+        const subjectsCount = Array.isArray(data.subjects) ? data.subjects.length : 0;
 
-        if (tasksCount === 0 && schedCount === 0 && ovrCount === 0 && notesCount === 0) {
+        if (tasksCount === 0 && schedCount === 0 && ovrCount === 0 && notesCount === 0 && subjectsCount === 0) {
           throw new Error(currentLang === "en" ? "Backup file is empty or invalid" : "File cadangan kosong atau tidak berisi data yang sesuai");
         }
 
@@ -1919,6 +2119,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       closeImportModal();
+      await loadSubjects();
 
       const counts = res.imported || {};
       toast(t("toast_import_summary").replace("{tasks}", counts.tasks || 0).replace("{schedules}", counts.schedules || 0));
@@ -1992,6 +2193,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.handleImportFile = handleImportFile;
   window.closeImportModal = closeImportModal;
   window.executeImport = executeImport;
+  window.openSubjectModal = openSubjectModal;
+  window.closeSubjectModal = closeSubjectModal;
+  window.handleCreateSubject = handleCreateSubject;
+  window.confirmDeleteSubject = confirmDeleteSubject;
 
   // Apply current preferences
   document.documentElement.setAttribute("data-theme", currentTheme);
