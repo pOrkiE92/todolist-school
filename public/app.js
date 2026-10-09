@@ -2060,7 +2060,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const backup = {
         app: "Todolist Sekolah",
-        version: "1.1.0",
+        version: "2.0.0",
         exported_at: new Date().toISOString(),
         data: { tasks, schedules, overrides, notes, subjects: subjectsData }
       };

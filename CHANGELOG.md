@@ -5,7 +5,35 @@ Semua perubahan penting pada proyek ini didokumentasikan dalam file ini.
 Format ini berdasarkan [Keep a Changelog](https://keepachangelog.com/id/1.0.0/),
 dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2026-09-20
+## [2.0.0] - 2026-10-10
+
+### Added
+- **UI & UX Modern Rework**:
+  - Desain antarmuka baru dengan tipografi Poppins dan skema visual modern yang konsisten.
+  - Notifikasi toast akselerasi GPU (hardware-accelerated animations).
+  - Manajemen Mata Pelajaran Kustom (Custom Subjects): penambahan tabel `subjects` dan API `/api/subjects` (tambah, lihat, hapus mapel dinamis dengan proteksi duplikasi case-insensitive).
+  - Integrasi pemilihan mapel kustom pada modal Task dan Schedule secara realtime.
+  - Impor Cadangan Data (Backup Import): dukungan mode `merge` dan `replace` dengan atomic transaction SQLite (`BEGIN TRANSACTION` / `COMMIT` / `ROLLBACK`).
+  - Runner startup fleksibel: mendukung `node start`, `node dev` (dengan auto-reload `--watch` dan propagasi sinyal shutdown), `node prod`, serta script npm (`npm start`, `npm run dev`).
+  - Opsi format waktu 12 Jam (AM/PM) dan 24 Jam di seluruh tampilan UI dan modal.
+
+### Fixed
+- **Schedule UI & Modals**:
+  - Memperbaiki event handler `schedule-add-btn` dan backdrop modal jadwal.
+  - Memindahkan posisi input guru ke bawah input ruangan untuk mencegah horizontal scroll pada layar mobile.
+  - Menghilangkan link label berulang pada modal mata pelajaran dan merapikan layout tombol tambah mapel.
+  - Sinkronisasi instan counter navigasi dan render tampilan saat penghapusan slot jadwal tanpa memerlukan refresh halaman.
+- **Quick Notes Formatting**:
+  - Menghapus indentasi template literal pada kartu catatan bebas sehingga baris pertama teks tidak lagi bergeser/offset.
+- **Pengaturan & Lokalisasi**:
+  - Menyelesaikan desinkronisasi bahasa antarmuka saat halaman dimuat ulang.
+
+### Performance
+- Optimasi performa full-stack pada kueri SQLite, Express middleware, caching aset statis, dan siklus rendering DOM.
+
+---
+
+## [1.1.0] - 2026-09-20
 
 ### Added
 - **Fitur Pengaturan (Settings Tab)**:
