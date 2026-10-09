@@ -1094,9 +1094,7 @@ async function loadOverrides() {
                 <strong>${ovr.date}</strong>
                 ${typeBadge}
               </div>
-              <p class="card-desc" style="margin-top:4px;">
-                ${escapeHtml(ovr.keterangan || (ovr.type === "cancel" ? t("override_cancel") : ovr.mapel))}
-              </p>
+              <p class="card-desc" style="margin-top:4px;">${escapeHtml(ovr.keterangan || (ovr.type === "cancel" ? t("override_cancel") : ovr.mapel))}</p>
             </div>
             <div style="display:flex; align-items:center; gap:4px;">
               <button class="btn btn-ghost btn-sm" onclick="editOverride('${ovr.id}')" title="${t("btn_edit")}">✏</button>
@@ -1141,9 +1139,7 @@ async function loadNotes() {
     container.innerHTML = list.map((n) => `
       <div class="card">
         <div class="card-header-row">
-          <p class="card-desc" style="color:var(--card-foreground); font-size:13px; font-weight:500;">
-            ${escapeHtml(n.teks)}
-          </p>
+          <p class="card-desc" style="color:var(--card-foreground); font-size:13px; font-weight:500; flex:1; min-width:0; margin:0;">${escapeHtml(n.teks)}</p>
           ${n.status === "converted" ? `<span class="badge" style="background:var(--success-light); color:#047857; flex-shrink:0;">${t("badge_converted")}</span>` : ""}
         </div>
         <p class="hint-text" style="margin-top:4px;">${formatDeadline(n.created_at)}</p>
