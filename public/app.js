@@ -689,6 +689,14 @@ function toast(msg, type = "success") {
 }
 
 // ──────────── TABS NAVIGATION ────────────
+function handleScheduleAddClick() {
+  if (scheduleSubTab === "weekly") {
+    openScheduleModal();
+  } else {
+    openOverrideModal();
+  }
+}
+
 function setTab(tabName) {
   currentTab = tabName;
 
@@ -703,8 +711,7 @@ function setTab(tabName) {
   if (tabName === "dashboard") loadDashboard();
   if (tabName === "tasks") loadTasks();
   if (tabName === "schedule") {
-    if (scheduleSubTab === "weekly") loadSchedule();
-    else loadOverrides();
+    setScheduleSubTab(scheduleSubTab);
   }
   if (tabName === "notes") loadNotes();
   if (tabName === "settings") loadSettings();
@@ -713,15 +720,21 @@ function setTab(tabName) {
 function setScheduleSubTab(sub) {
   scheduleSubTab = sub;
   const isWeekly = sub === "weekly";
-  document.getElementById("subtab-weekly").classList.toggle("active", isWeekly);
-  document.getElementById("subtab-overrides").classList.toggle("active", !isWeekly);
-  document.getElementById("subpanel-weekly").hidden = !isWeekly;
-  document.getElementById("subpanel-overrides").hidden = isWeekly;
+  const subWeekly = document.getElementById("subtab-weekly");
+  const subOverrides = document.getElementById("subtab-overrides");
+  const panelWeekly = document.getElementById("subpanel-weekly");
+  const panelOverrides = document.getElementById("subpanel-overrides");
+
+  if (subWeekly) subWeekly.classList.toggle("active", isWeekly);
+  if (subOverrides) subOverrides.classList.toggle("active", !isWeekly);
+  if (panelWeekly) panelWeekly.hidden = !isWeekly;
+  if (panelOverrides) panelOverrides.hidden = isWeekly;
 
   const addBtn = document.getElementById("schedule-add-btn");
   if (addBtn) {
     addBtn.textContent = isWeekly ? t("btn_add_schedule") : t("btn_add_override");
-    addBtn.onclick = isWeekly ? () => openScheduleModal() : () => openOverrideModal();
+    addBtn.setAttribute("data-i18n", isWeekly ? "btn_add_schedule" : "btn_add_override");
+    addBtn.onclick = handleScheduleAddClick;
   }
 
   if (isWeekly) loadSchedule();
@@ -1246,11 +1259,19 @@ function openTaskModal(config = {}) {
   document.getElementById("tf-catatan").value = initial.catatan || "";
 
   clearFormErrors("tf");
-  document.getElementById("task-modal-backdrop").hidden = false;
+  const taskBackdrop = document.getElementById("task-modal-backdrop");
+  if (taskBackdrop) {
+    taskBackdrop.hidden = false;
+    taskBackdrop.style.display = "flex";
+  }
 }
 
 function closeTaskModal() {
-  document.getElementById("task-modal-backdrop").hidden = true;
+  const taskBackdrop = document.getElementById("task-modal-backdrop");
+  if (taskBackdrop) {
+    taskBackdrop.hidden = true;
+    taskBackdrop.style.display = "none";
+  }
   editingTaskId = null;
   sourceNoteIdForTask = null;
 }
@@ -1289,11 +1310,19 @@ function openScheduleModal(initial = null) {
   document.getElementById("sf-guru").value = initial?.guru || "";
 
   clearFormErrors("sf");
-  document.getElementById("schedule-modal-backdrop").hidden = false;
+  const schedBackdrop = document.getElementById("schedule-modal-backdrop");
+  if (schedBackdrop) {
+    schedBackdrop.hidden = false;
+    schedBackdrop.style.display = "flex";
+  }
 }
 
 function closeScheduleModal() {
-  document.getElementById("schedule-modal-backdrop").hidden = true;
+  const schedBackdrop = document.getElementById("schedule-modal-backdrop");
+  if (schedBackdrop) {
+    schedBackdrop.hidden = true;
+    schedBackdrop.style.display = "none";
+  }
   editingScheduleId = null;
 }
 
@@ -1326,11 +1355,19 @@ function openOverrideModal(initial = null) {
 
   handleOverrideTypeChange(type);
   clearFormErrors("of");
-  document.getElementById("override-modal-backdrop").hidden = false;
+  const ovrBackdrop = document.getElementById("override-modal-backdrop");
+  if (ovrBackdrop) {
+    ovrBackdrop.hidden = false;
+    ovrBackdrop.style.display = "flex";
+  }
 }
 
 function closeOverrideModal() {
-  document.getElementById("override-modal-backdrop").hidden = true;
+  const ovrBackdrop = document.getElementById("override-modal-backdrop");
+  if (ovrBackdrop) {
+    ovrBackdrop.hidden = true;
+    ovrBackdrop.style.display = "none";
+  }
   editingOverrideId = null;
 }
 
@@ -1654,6 +1691,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add Task Button
   const addTaskBtn = document.getElementById("add-task-btn");
   if (addTaskBtn) addTaskBtn.addEventListener("click", () => openTaskModal());
+
+  // Add Schedule Button
+  const scheduleAddBtn = document.getElementById("schedule-add-btn");
+  if (scheduleAddBtn) scheduleAddBtn.addEventListener("click", handleScheduleAddClick);
 
   // Task Form Submit
   const taskForm = document.getElementById("task-form");
@@ -2197,6 +2238,12 @@ document.addEventListener("DOMContentLoaded", () => {
   window.closeSubjectModal = closeSubjectModal;
   window.handleCreateSubject = handleCreateSubject;
   window.confirmDeleteSubject = confirmDeleteSubject;
+  window.handleScheduleAddClick = handleScheduleAddClick;
+  window.openScheduleModal = openScheduleModal;
+  window.closeScheduleModal = closeScheduleModal;
+  window.openOverrideModal = openOverrideModal;
+  window.closeOverrideModal = closeOverrideModal;
+  window.setScheduleSubTab = setScheduleSubTab;
 
   // Apply current preferences
   document.documentElement.setAttribute("data-theme", currentTheme);
