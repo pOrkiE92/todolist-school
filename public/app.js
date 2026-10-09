@@ -530,7 +530,11 @@ let editingScheduleId = null;
 let editingOverrideId = null;
 let sourceNoteIdForTask = null;
 let confirmCallback = null;
-let activeNavRequestId = 0;
+let activeDashboardReqId = 0;
+let activeTasksReqId = 0;
+let activeScheduleReqId = 0;
+let activeOverridesReqId = 0;
+let activeNotesReqId = 0;
 
 function updateOverdueBadgeElements(overdueList) {
   const dotDesktop = document.getElementById("overdue-dot-desktop");
@@ -743,7 +747,7 @@ function setScheduleSubTab(sub) {
 
 // ──────────── DASHBOARD MODULE ────────────
 async function loadDashboard() {
-  const reqId = ++activeNavRequestId;
+  const reqId = ++activeDashboardReqId;
   try {
     const [todaySlots, allTasks, notes] = await Promise.all([
       api("/schedule/today").catch(() => []),
@@ -778,7 +782,7 @@ async function loadDashboard() {
     updateOverdueBadgeElements(overdueList);
 
     // If navigated to another tab or superseded by newer request, avoid layout work
-    if (currentTab !== "dashboard" || reqId !== activeNavRequestId) return;
+    if (currentTab !== "dashboard" || reqId !== activeDashboardReqId) return;
 
     // 1. Jadwal Hari Ini
     const schedContainer = document.getElementById("dashboard-schedule");
@@ -881,7 +885,7 @@ function renderEffectiveSlot(slot) {
 
 // ──────────── TASKS MODULE ────────────
 async function loadTasks() {
-  const reqId = ++activeNavRequestId;
+  const reqId = ++activeTasksReqId;
   const status = document.getElementById("filter-status").value;
   const mapel = document.getElementById("filter-mapel").value;
   const sort = document.getElementById("filter-sort").value;
@@ -896,7 +900,7 @@ async function loadTasks() {
     if (tasks && Array.isArray(tasks)) {
       updateOverdueBadgeElements(tasks.filter((t) => t.status !== "done" && t.is_overdue));
     }
-    if (currentTab !== "tasks" || reqId !== activeNavRequestId) return;
+    if (currentTab !== "tasks" || reqId !== activeTasksReqId) return;
     if (!tasks || tasks.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -1017,12 +1021,12 @@ function selectDay(dow) {
 }
 
 async function loadSchedule() {
-  const reqId = ++activeNavRequestId;
+  const reqId = ++activeScheduleReqId;
   renderDayPills();
   const container = document.getElementById("schedule-list");
   try {
     const list = await api(`/schedule?day=${selectedDay}`);
-    if (currentTab !== "schedule" || scheduleSubTab !== "weekly" || reqId !== activeNavRequestId) return;
+    if (currentTab !== "schedule" || scheduleSubTab !== "weekly" || reqId !== activeScheduleReqId) return;
     if (!list || list.length === 0) {
       const dayName = DAY_NAMES[selectedDay];
       const emptyTitle = t("empty_schedule_day_title").replace("{day}", dayName);
@@ -1064,14 +1068,14 @@ async function loadSchedule() {
 
 // ──────────── OVERRIDES MODULE ────────────
 async function loadOverrides() {
-  const reqId = ++activeNavRequestId;
+  const reqId = ++activeOverridesReqId;
   const container = document.getElementById("overrides-list");
   try {
     const list = await api("/schedule/overrides");
     const badgeCount = document.getElementById("override-count-badge");
     if (badgeCount) badgeCount.textContent = `(${list.length})`;
 
-    if (currentTab !== "schedule" || scheduleSubTab !== "overrides" || reqId !== activeNavRequestId) return;
+    if (currentTab !== "schedule" || scheduleSubTab !== "overrides" || reqId !== activeOverridesReqId) return;
 
     if (!list || list.length === 0) {
       container.innerHTML = `
@@ -1121,11 +1125,11 @@ async function loadOverrides() {
 
 // ──────────── QUICK NOTES MODULE ────────────
 async function loadNotes() {
-  const reqId = ++activeNavRequestId;
+  const reqId = ++activeNotesReqId;
   const container = document.getElementById("notes-list");
   try {
     const list = await api("/quicknotes");
-    if (currentTab !== "notes" || reqId !== activeNavRequestId) return;
+    if (currentTab !== "notes" || reqId !== activeNotesReqId) return;
     if (!list || list.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -1423,8 +1427,8 @@ async function confirmDeleteTask(id) {
       try {
         await api(`/tasks/${id}`, { method: "DELETE" });
         toast(t("toast_task_deleted"));
-        loadDashboard();
-        if (currentTab === "tasks") loadTasks();
+        if (currentTab === "tasks") await loadTasks();
+        if (currentTab === "dashboard") await loadDashboard();
       } catch (err) {
         toast(`${t("err_delete")}: ${err.message}`, "error");
       }
@@ -1440,8 +1444,8 @@ async function confirmDeleteSchedule(id) {
       try {
         await api(`/schedule/${id}`, { method: "DELETE" });
         toast(t("toast_schedule_deleted"));
-        loadSchedule();
-        loadDashboard();
+        if (currentTab === "schedule") await loadSchedule();
+        if (currentTab === "dashboard") await loadDashboard();
       } catch (err) {
         toast(`${t("err_delete")}: ${err.message}`, "error");
       }
@@ -1457,8 +1461,8 @@ async function confirmDeleteOverride(id) {
       try {
         await api(`/schedule/overrides/${id}`, { method: "DELETE" });
         toast(t("toast_override_deleted"));
-        loadOverrides();
-        loadDashboard();
+        if (currentTab === "schedule") await loadOverrides();
+        if (currentTab === "dashboard") await loadDashboard();
       } catch (err) {
         toast(`${t("err_delete")}: ${err.message}`, "error");
       }
@@ -1474,8 +1478,8 @@ async function confirmDeleteNote(id) {
       try {
         await api(`/quicknotes/${id}`, { method: "DELETE" });
         toast(t("toast_note_deleted"));
-        loadNotes();
-        loadDashboard();
+        if (currentTab === "notes") await loadNotes();
+        if (currentTab === "dashboard") await loadDashboard();
       } catch (err) {
         toast(`${t("err_delete")}: ${err.message}`, "error");
       }
@@ -2234,6 +2238,10 @@ document.addEventListener("DOMContentLoaded", () => {
   window.closeSubjectModal = closeSubjectModal;
   window.handleCreateSubject = handleCreateSubject;
   window.confirmDeleteSubject = confirmDeleteSubject;
+  window.confirmDeleteTask = confirmDeleteTask;
+  window.confirmDeleteSchedule = confirmDeleteSchedule;
+  window.confirmDeleteOverride = confirmDeleteOverride;
+  window.confirmDeleteNote = confirmDeleteNote;
   window.handleScheduleAddClick = handleScheduleAddClick;
   window.openScheduleModal = openScheduleModal;
   window.closeScheduleModal = closeScheduleModal;
