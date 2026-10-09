@@ -4,8 +4,10 @@
   "description": "Backend produksi — Website Todolist Tugas Sekolah",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node start",
+    "dev": "node dev",
+    "server": "node server.js",
+    "prod": "node prod"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

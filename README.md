@@ -46,8 +46,20 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ### 3. Jalankan Aplikasi
 
+**Mode Standar / Produksi:**
 ```bash
+node start
+# atau
 npm start
+# atau
+node server.js
+```
+
+**Mode Pengembangan (Dev / Auto-reload):**
+```bash
+node dev
+# atau
+npm run dev
 ```
 
 Buka browser di `http://localhost:3000` (atau port yang disetel).

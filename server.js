@@ -3,6 +3,13 @@
 
 "use strict";
 
+if (process.argv[2] === "dev") {
+  if (!process.execArgv.includes("--watch")) {
+    require("./dev");
+    return;
+  }
+}
+
 // Load .env sebelum apapun
 require("dotenv").config();
 
@@ -84,4 +91,6 @@ function gracefulShutdown(signal) {
 
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+
+module.exports = { app, server };
 
