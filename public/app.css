@@ -1244,6 +1244,8 @@ input, select, textarea, button {
   max-width: 460px;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
   box-shadow: var(--shadow-lg);
   padding: 24px;
   display: flex;
@@ -1260,6 +1262,7 @@ input, select, textarea, button {
 
 .modal-sm {
   max-width: 380px;
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -1697,20 +1700,86 @@ input, select, textarea, button {
   color: var(--text);
 }
 
-.form-label-row {
+.subject-select-row {
   display: flex;
-  justify-content: space-between;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.subject-select-row .form-select {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.subject-add-btn {
+  display: inline-flex;
   align-items: center;
-  margin-bottom: 4px;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease, transform 0.1s ease;
+}
+
+.subject-add-btn:hover {
+  background-color: var(--primary-light, rgba(79, 70, 229, 0.08));
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.subject-add-btn:active {
+  transform: scale(0.96);
+}
+
+.add-subject-form {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.add-subject-form .form-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.add-subject-form .btn {
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .subject-chips-list {
   max-height: 220px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 2px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .subject-chip-item {
@@ -1722,12 +1791,21 @@ input, select, textarea, button {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm, 6px);
   transition: background 0.15s ease;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .subject-chip-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--card-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+  margin-right: 8px;
 }
 
 .subject-delete-btn {
@@ -1741,6 +1819,7 @@ input, select, textarea, button {
   transition: opacity 0.15s, background 0.15s;
   line-height: 1;
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .subject-delete-btn:hover {
